@@ -1,0 +1,84 @@
+import axios from 'axios';
+
+export const NoteLocation = {
+  LEAD: 'LEAD',
+  OPPORTUNITY: 'OPPORTUNITY',
+  CUSTOMER: 'CUSTOMER'
+};
+
+const BASE_URL = 'http://localhost:8080/api/notes';
+
+const NotesService = {
+  getAllNotes: async () => {
+    try {
+      const response = await axios.get(BASE_URL);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching all notes:', error);
+      return [];
+    }
+  },
+
+  getNotesByLocation: async (location, id) => {
+    if (!id) {
+      console.error('Location ID is required');
+      return [];
+    }
+
+    try {
+      console.log(`Fetching notes for ${location} ID: ${id}`);
+      const response = await axios.get(`${BASE_URL}/${location}/${id}`);
+      console.log(`Found ${response.data.length} notes for ${location} ID: ${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching notes for ${location} ID ${id}:`, error);
+      return [];
+    }
+  },
+
+  createNote: async (note) => {
+    try {
+      console.log('Creating note:', note);
+      const response = await axios.post(BASE_URL, note);
+      console.log('Note created successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating note:', error);
+      return null;
+    }
+  },
+
+  updateNote: async (note) => {
+    if (!note.id) {
+      console.error('Note ID is required for updates');
+      return null;
+    }
+
+    try {
+      console.log(`Updating note ID ${note.id}:`, note);
+      const response = await axios.put(`${BASE_URL}/${note.id}`, note);
+      console.log('Note updated successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating note ID ${note.id}:`, error);
+      return null;
+    }
+  },
+
+  deleteNote: async (id) => {
+    try {
+      console.log(`Deleting note ID ${id}`);
+      await axios.delete(`${BASE_URL}/${id}`);
+      console.log(`Note ID ${id} deleted successfully`);
+    } catch (error) {
+      console.error(`Error deleting note ID ${id}:`, error);
+    }
+  }
+};
+
+// Export types for use in components
+export const Note = {
+  // Type definitions for IDE support
+};
+
+export default NotesService;
