@@ -1,6 +1,6 @@
 # CREMIx - Customer Relationship Management System
 
-This repository contains a full-stack CRM application with the following components:
+A comprehensive CRM application that allows organizations to manage interactions with clients, track leads, and maintain client information and communication history.
 
 ## Project Structure
 
