@@ -3,9 +3,10 @@ import { UserIcon, PencilIcon, DocumentTextIcon } from '@heroicons/react/24/soli
 
 const CustomerNavigation = ({ activeTab, onTabChange }) => {
   const navItems = [
-    { id: 'profile', label: 'Profile', icon: <UserIcon className="w-6 h-6" /> },
-    { id: 'notes', label: 'Notes', icon: <PencilIcon className="w-6 h-6" /> },
+    { id: 'quotation', label: 'Quotation', icon: <DocumentTextIcon className="w-6 h-6" /> },
     { id: 'invoice', label: 'Invoice', icon: <DocumentTextIcon className="w-6 h-6" /> },
+    { id: 'products', label: 'Products', icon: <DocumentTextIcon className="w-6 h-6" /> },
+    { id: 'tickets', label: 'Tickets', icon: <DocumentTextIcon className="w-6 h-6" /> },
   ];
 
   return (

@@ -1,72 +1,96 @@
 import React from "react";
 
 const OpportunityCard = ({ opportunity, onViewDetails, onEdit, onDelete }) => {
+  // Generate initials from name
+  const getInitials = (name) => {
+    if (!name) return "OP";
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Generate random avatar colors
+  const getAvatarColor = (name) => {
+    const colors = [
+      'bg-blue-500',
+      'bg-green-500', 
+      'bg-purple-500',
+      'bg-orange-500',
+      'bg-red-500',
+      'bg-indigo-500',
+      'bg-pink-500',
+      'bg-yellow-500'
+    ];
+    const index = name ? name.charCodeAt(0) % colors.length : 0;
+    return colors[index];
+  };
+
   return (
-    <div className="bg-white shadow-md rounded-lg mb-4 border">
-      {/* Header */}
-      <div className="flex justify-between items-center bg-[#2e4a7a] text-white px-4 py-2 rounded-t-lg">
-        <h5 className="text-lg font-semibold">{opportunity.lead?.name}</h5>
-        <div className="text-sm">
-          {opportunity.createdDate && (
-            <strong>Created on: {opportunity.createdDate}</strong>
-          )}
-        </div>
-      </div>
-
-      {/* Body */}
-      <div className="bg-[#f0f4fa] p-4 rounded-b-lg">
-        <div className="mb-3 space-y-1 text-sm">
-          <div>
-            <strong>Phone: </strong> {opportunity.lead?.phoneNumber}
+    <div className="bg-white rounded-2xl border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden group">
+      {/* Main Content */}
+      <div className="p-6">
+        <div className="flex items-start gap-4 mb-6">
+          {/* Avatar */}
+          <div className={`w-16 h-16 ${getAvatarColor(opportunity.lead?.name)} rounded-full flex items-center justify-center text-white font-semibold text-lg flex-shrink-0`}>
+            {getInitials(opportunity.lead?.name)}
           </div>
-          <div>
-            <strong>Email: </strong> {opportunity.lead?.email}
-          </div>
-          <div>
-            <strong>Assigned To: </strong>{" "}
-            {opportunity.lead?.assignedTo || "Super Admin"}
-          </div>
-          {opportunity.lead?.requirement && (
-            <div>
-              <strong>Requirement: </strong> {opportunity.lead.requirement}
-            </div>
-          )}
-
-          {/* Quotation Flag */}
-          <div>
-            <strong>Quotation: </strong>
-            {opportunity.quotationId ? (
-              <span className="bg-green-500 text-white px-2 py-0.5 rounded text-xs font-medium">
-                Created
-              </span>
-            ) : (
-              <span className="bg-yellow-400 text-black px-2 py-0.5 rounded text-xs font-medium">
-                Not Created
-              </span>
+          
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {opportunity.lead?.name || 'Unnamed Opportunity'}
+            </h3>
+            <p className="text-gray-500 text-sm mb-1">
+              {opportunity.lead?.email}
+            </p>
+            {opportunity.lead?.phoneNumber && (
+              <p className="text-gray-500 text-sm">
+                {opportunity.lead?.phoneNumber}
+              </p>
             )}
           </div>
         </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-2">
-          <button
-            className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded flex items-center"
-            onClick={onViewDetails}
-          >
-            <i className="bi bi-eye mr-1"></i> View Details
-          </button>
-          <button
-            className="bg-gray-600 hover:bg-gray-700 text-white text-sm px-3 py-1 rounded flex items-center"
-            onClick={onEdit}
-          >
-            <i className="bi bi-pencil mr-1"></i> Edit
-          </button>
-          <button
-            className="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1 rounded flex items-center"
-            onClick={onDelete}
-          >
-            <i className="bi bi-trash mr-1"></i> Delete
-          </button>
+        
+        {/* Status Badge */}
+        <div className="mb-4">
+          {opportunity.quotationId ? (
+            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
+              Quotation Created
+            </span>
+          ) : (
+            <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-medium">
+              Quotation Pending
+            </span>
+          )}
+        </div>
+        
+        {/* View Details Button */}
+        <button
+          onClick={onViewDetails}
+          className="text-teal-600 hover:text-teal-700 text-sm font-medium transition-colors duration-200 mb-4 block"
+        >
+          View Details
+        </button>
+        
+        {/* Action buttons - show on hover */}
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="flex gap-2 pt-2 border-t border-gray-100">
+            <button
+              onClick={onEdit}
+              className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-xs hover:bg-gray-200 transition-colors"
+            >
+              Edit
+            </button>
+            <button
+              onClick={onDelete}
+              className="px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-xs hover:bg-red-200 transition-colors"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>

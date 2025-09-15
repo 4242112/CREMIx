@@ -14,7 +14,8 @@ public class TicketDTO {
         OPEN("Open"),
         IN_PROGRESS("In Progress"),
         RESOLVED("Resolved"),
-        CLOSED("Closed");
+        CLOSED("Closed"),
+        URGENT("Urgent");
         
         private final String value;
         

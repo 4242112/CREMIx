@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Customer } from '../../../../services/CustomerService';
-import NotesService, { Note, NoteLocation } from '../../../../services/NotesService';
+import NotesService, { NoteLocation } from '../../../../services/NotesService';
 import { PencilIcon, TrashIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
 const NotesButton = ({ customer }) => {

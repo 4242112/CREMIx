@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
 public class AuthController {
 
     @Autowired
@@ -131,6 +131,26 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } else {
             // Invalid password
+            return ResponseEntity.status(401).body(new LoginResponseDTO(false, null, null, null, null));
+        }
+    }
+    
+    @PostMapping("/login/admin")
+    public ResponseEntity<LoginResponseDTO> adminLogin(@RequestBody LoginRequestDTO loginRequest) {
+        // Validate admin credentials
+        String ADMIN_EMAIL = "admin@gmail.com";
+        String ADMIN_PASSWORD = "Admin@123";
+        
+        if (ADMIN_EMAIL.equals(loginRequest.getEmail()) && ADMIN_PASSWORD.equals(loginRequest.getPassword())) {
+            LoginResponseDTO response = new LoginResponseDTO(
+                true,
+                1L, // Admin ID
+                "Administrator",
+                "admin@gmail.com",
+                "ADMIN"
+            );
+            return ResponseEntity.ok(response);
+        } else {
             return ResponseEntity.status(401).body(new LoginResponseDTO(false, null, null, null, null));
         }
     }

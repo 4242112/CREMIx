@@ -7,11 +7,14 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.CREMIx.dto.InvoiceDTO;
 import com.example.CREMIx.dto.QuotationDTO;
 import com.example.CREMIx.model.Customer;
 import com.example.CREMIx.model.QItem;
 import com.example.CREMIx.model.Quotation;
+import com.example.CREMIx.repository.CustomerRepository;
 import com.example.CREMIx.repository.OpportunityRepository;
 import com.example.CREMIx.repository.ProductRepository;
 import com.example.CREMIx.repository.QuotationRepository;
@@ -29,7 +32,13 @@ public class QuotationService {
     private ProductRepository productRepository;
     
     @Autowired
+    private CustomerRepository customerRepository;
+    
+    @Autowired
     private EmailService emailService;
+    
+    @Autowired
+    private InvoiceService invoiceService;
 
     public Optional<QuotationDTO> getQuotationByOpportunity(Long opportunityId) {
         return quotationRepository.findByOpportunityId(opportunityId);
@@ -62,6 +71,9 @@ public class QuotationService {
         Quotation savedQuotation = null;
         if (opportunity.isPresent()) {
             var opp = opportunity.get();
+            
+            // Set both opportunity and customer relationships
+            quotation.setCustomer(opp.getCustomer());
             opp.setQuotation(quotation);
 
             savedQuotation = opportunityRepository.save(opp).getQuotation();
@@ -71,10 +83,60 @@ public class QuotationService {
         return new QuotationDTO(savedQuotation);
     }
 
+    /**
+     * Create a quotation directly for a customer (not linked to an opportunity)
+     * This allows multiple quotations per customer
+     * 
+     * @param customerId The ID of the customer
+     * @param quotationDTO The quotation data
+     * @return The created quotation DTO
+     */
+    public QuotationDTO createQuotationForCustomer(Long customerId, QuotationDTO quotationDTO) {
+        // Verify customer exists
+        Optional<Customer> customerOpt = customerRepository.findById(customerId);
+        if (!customerOpt.isPresent()) {
+            throw new RuntimeException("Customer not found");
+        }
+        
+        Customer customer = customerOpt.get();
+        
+        Quotation quotation = new Quotation();
+        quotation.setTitle(quotationDTO.getTitle());
+        quotation.setDescription(quotationDTO.getDescription());
+        quotation.setValidUntil(quotationDTO.getValidUntil());
+        quotation.setTotal(quotationDTO.getAmount());
+        quotation.setCustomer(customer); // Set direct customer relationship
+
+        // Create a mutable list for items
+        List<QItem> itemsList = new ArrayList<>();
+        for (var item : quotationDTO.getItems()) {
+            QItem qItem = new QItem();
+            var product = productRepository.findByNameContainingIgnoreCase(
+                item.getProduct().getName()
+            );
+            qItem.setProduct((product));
+            qItem.setQuantity(item.getQuantity());
+            qItem.setDiscount(item.getDiscount() != null ? item.getDiscount() : 0.0);
+            qItem.setQuotation(quotation);
+            itemsList.add(qItem);
+        }
+        quotation.setItems(itemsList);
+
+        Quotation savedQuotation = quotationRepository.save(quotation);
+        return new QuotationDTO(savedQuotation);
+    }
+
     public QuotationDTO updateQuotation(Long id, QuotationDTO quotationDTO) {
         Optional<Quotation> optionalQuotation = quotationRepository.findById(id);
         if (optionalQuotation.isPresent()) {
             Quotation quotation = optionalQuotation.get();
+            
+            // Check if quotation can be modified
+            if (quotation.getStage() == Quotation.Stage.ACCEPTED || 
+                quotation.getStage() == Quotation.Stage.CONVERTED) {
+                throw new IllegalStateException("Cannot modify quotation that has been accepted or converted. Current stage: " + quotation.getStage());
+            }
+            
             quotation.setTitle(quotationDTO.getTitle());
             quotation.setDescription(quotationDTO.getDescription());
             quotation.setValidUntil(quotationDTO.getValidUntil());
@@ -182,12 +244,13 @@ public class QuotationService {
     }
 
     /**
-     * Accept a quotation (change stage from SENT to ACCEPTED)
+     * Accept a quotation (change stage from SENT to ACCEPTED) and automatically generate invoice
      * @param id The ID of the quotation to accept
      * @return The updated quotation DTO
      * @throws IllegalStateException if the quotation is not in SENT stage
      * @throws RuntimeException if the quotation is not found
      */
+    @Transactional
     public QuotationDTO acceptQuotation(Long id) {
         Optional<Quotation> optionalQuotation = quotationRepository.findById(id);
         if (optionalQuotation.isPresent()) {
@@ -203,6 +266,22 @@ public class QuotationService {
             
             // Save the updated quotation
             Quotation updatedQuotation = quotationRepository.save(quotation);
+            
+            // Automatically generate invoice from accepted quotation
+            try {
+                InvoiceDTO generatedInvoice = invoiceService.generateInvoiceFromQuotation(id);
+                
+                // Automatically send the invoice to the customer
+                invoiceService.sendInvoiceToCustomer(generatedInvoice.getId());
+                
+                System.out.println("Invoice automatically generated and sent for accepted quotation: " + id);
+            } catch (Exception e) {
+                System.err.println("Failed to generate/send invoice for quotation: " + id);
+                System.err.println("Error: " + e.getMessage());
+                // We don't throw here to avoid rolling back quotation acceptance
+                // The quotation is still accepted, but invoice generation failed
+            }
+            
             return new QuotationDTO(updatedQuotation);
         } else {
             throw new RuntimeException("Quotation not found with id: " + id);

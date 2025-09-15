@@ -25,6 +25,17 @@ const AuthService = {
     return response.data;
   },
 
+  // Admin login
+  loginAdmin: async (credentials) => {
+    const response = await axios.post(`${API_URL}/login/admin`, credentials);
+
+    if (response.data && response.data.isAuthenticated) {
+      localStorage.setItem("adminAuth", JSON.stringify(response.data));
+    }
+
+    return response.data;
+  },
+
   // Customer registration
   registerCustomer: async (customerData) => {
     try {
@@ -51,6 +62,19 @@ const AuthService = {
     return !!authData && JSON.parse(authData).isAuthenticated;
   },
 
+  // Check if admin is logged in
+  isAdminLoggedIn: () => {
+    const authData = localStorage.getItem("adminAuth");
+    return !!authData && JSON.parse(authData).isAuthenticated;
+  },
+
+  // Check if any user is logged in
+  isAnyUserLoggedIn: () => {
+    return AuthService.isEmployeeLoggedIn() || 
+           AuthService.isCustomerLoggedIn() || 
+           AuthService.isAdminLoggedIn();
+  },
+
   // Get current employee info
   getCurrentEmployee: () => {
     const authData = localStorage.getItem("employeeAuth");
@@ -63,6 +87,12 @@ const AuthService = {
     return authData ? JSON.parse(authData) : null;
   },
 
+  // Get current admin info
+  getCurrentAdmin: () => {
+    const authData = localStorage.getItem("adminAuth");
+    return authData ? JSON.parse(authData) : null;
+  },
+
   // Logout employee
   logoutEmployee: () => {
     localStorage.removeItem("employeeAuth");
@@ -71,6 +101,34 @@ const AuthService = {
   // Logout customer
   logoutCustomer: () => {
     localStorage.removeItem("customerAuth");
+  },
+
+  // Logout admin
+  logoutAdmin: () => {
+    localStorage.removeItem("adminAuth");
+  },
+
+  // Logout all users
+  logoutAll: () => {
+    localStorage.removeItem("employeeAuth");
+    localStorage.removeItem("customerAuth");
+    localStorage.removeItem("adminAuth");
+  },
+
+  // Get current user type
+  getCurrentUserType: () => {
+    if (AuthService.isAdminLoggedIn()) return "ADMIN";
+    if (AuthService.isEmployeeLoggedIn()) return "EMPLOYEE";
+    if (AuthService.isCustomerLoggedIn()) return "CUSTOMER";
+    return null;
+  },
+
+  // Get current user info (any type)
+  getCurrentUser: () => {
+    if (AuthService.isAdminLoggedIn()) return AuthService.getCurrentAdmin();
+    if (AuthService.isEmployeeLoggedIn()) return AuthService.getCurrentEmployee();
+    if (AuthService.isCustomerLoggedIn()) return AuthService.getCurrentCustomer();
+    return null;
   },
 };
 

@@ -174,6 +174,7 @@ const CustomerQuotation = ({ customerId, customerEmail }) => {
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-4 py-2 border">Quotation ID</th>
+                <th className="px-4 py-2 border">Title</th>
                 <th className="px-4 py-2 border">Date</th>
                 <th className="px-4 py-2 border">Total Amount</th>
                 <th className="px-4 py-2 border">Status</th>
@@ -184,6 +185,7 @@ const CustomerQuotation = ({ customerId, customerEmail }) => {
               {quotations.map((quotation) => (
                 <tr key={quotation.id} className="hover:bg-gray-50">
                   <td className="px-4 py-2 border">{quotation.id}</td>
+                  <td className="px-4 py-2 border">{quotation.title || 'N/A'}</td>
                   <td className="px-4 py-2 border">{formatDate(quotation.createdAt)}</td>
                   <td className="px-4 py-2 border">₹{quotation.amount.toFixed(2)}</td>
                   <td className="px-4 py-2 border">

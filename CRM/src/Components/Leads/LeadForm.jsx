@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Lead, LeadSource } from "../../services/LeadService";
+import { LeadSource } from "../../services/LeadService";
 import EmployeeService from "../../services/EmployeeService";
 
 const defaultSources = Object.values(LeadSource).map((s) => s.toUpperCase());

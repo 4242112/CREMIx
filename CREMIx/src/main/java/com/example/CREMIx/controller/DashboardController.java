@@ -66,5 +66,4 @@ public class DashboardController {
         logger.info("Returning opportunities by stage data: {}", data);
         return ResponseEntity.ok(data);
     }
- 
 }

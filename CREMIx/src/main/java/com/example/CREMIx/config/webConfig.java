@@ -15,7 +15,7 @@ public class webConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173") // Your frontend URL
+                .allowedOrigins("http://localhost:5173", "http://localhost:5174") // Your frontend URL
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD")
                 .allowedHeaders("*")
                 .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Methods",
@@ -32,6 +32,7 @@ public class webConfig implements WebMvcConfigurer {
         
         // Allow requests from your frontend
         config.addAllowedOrigin("http://localhost:5173");
+        config.addAllowedOrigin("http://localhost:5174");
         
         // Allow all HTTP methods including OPTIONS for preflight
         config.addAllowedMethod("GET");

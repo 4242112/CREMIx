@@ -20,4 +20,6 @@ public interface TicketService {
     
     TicketDTO approveTicket(Long ticketId);
     TicketDTO denyTicket(Long ticketId);
+    TicketDTO escalateTicket(Long ticketId);
+    List<TicketDTO> getEscalatedTickets();
 }

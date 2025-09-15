@@ -189,6 +189,20 @@ public class TicketServiceImpl implements TicketService {
         return new TicketDTO(ticket);
     }
     
+    @Override
+    @Transactional
+    public TicketDTO escalateTicket(Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+            .orElseThrow(() -> new EntityNotFoundException("Ticket not found with id: " + ticketId));
+        
+        System.out.println("escalateTicket: " + ticketId);
+        ticket.setStatus(TicketStatus.URGENT);
+        ticket.setUpdatedAt(LocalDateTime.now());
+        ticket = ticketRepository.save(ticket);
+        
+        return new TicketDTO(ticket);
+    }
+    
     // Helper method to convert DTO to Entity
     private Ticket convertToEntity(TicketDTO dto) {
         Ticket ticket = new Ticket();
@@ -220,5 +234,18 @@ public class TicketServiceImpl implements TicketService {
         }
         
         return ticket;
+    }
+
+    @Override
+    public List<TicketDTO> getEscalatedTickets() {
+        return ticketRepository.findAll()
+                .stream()
+                .filter(ticket -> 
+                    ticket.getStatus() == TicketStatus.URGENT || 
+                    ticket.getPriority() == Ticket.TicketPriority.HIGH ||
+                    ticket.getPriority() == Ticket.TicketPriority.CRITICAL
+                )
+                .map(TicketDTO::new)
+                .collect(Collectors.toList());
     }
 }

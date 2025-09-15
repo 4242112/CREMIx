@@ -227,9 +227,4 @@ const CallLogService = {
   },
 };
 
-// Export types for use in components
-export const CallLog = {
-  // Type definitions for IDE support
-};
-
 export default CallLogService;

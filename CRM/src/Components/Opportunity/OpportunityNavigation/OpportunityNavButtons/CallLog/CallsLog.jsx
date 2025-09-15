@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-// Removed unused Opportunity import - type not needed in JavaScript
 import CallLogService from "../../../../../services/CallLogService";
 import CallsLogForm from "../../../../Leads/LeadNavigation/LeadNavButtons/CallLog/CallsLogForm";
 

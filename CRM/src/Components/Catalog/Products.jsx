@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ProductService from "../../services/ProductService";
 import CategoryService from "../../services/CategoryService";
+import ProductCard from "./ProductCard";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -237,66 +238,25 @@ const Products = () => {
 
       {/* Table */}
       {isLoading ? (
-        <div className="text-center py-6">Loading...</div>
+        <div className="text-center py-8">
+          <div className="text-gray-500">Loading...</div>
+        </div>
       ) : (
-        <div className="overflow-x-auto bg-white shadow rounded-lg">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="p-3">#</th>
-                <th className="p-3">Name</th>
-                <th className="p-3">Description</th>
-                <th className="p-3">Price</th>
-                <th className="p-3">Category</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.length > 0 ? (
-                products.map((product, index) => (
-                  <tr key={product.id} className="border-t">
-                    <td className="p-3">{index + 1}</td>
-                    <td className="p-3">{product.name}</td>
-                    <td className="p-3">{product.description}</td>
-                    <td className="p-3">₹ {product.price.toFixed(2)}</td>
-                    <td className="p-3">{product.category}</td>
-                    <td className="p-3">
-                      <span
-                        className={`px-2 py-1 text-xs rounded-full ${
-                          product.status === "Available"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-200 text-gray-700"
-                        }`}
-                      >
-                        {product.status}
-                      </span>
-                    </td>
-                    <td className="p-3 space-x-2">
-                      <button
-                        onClick={() => handleEditClick(product)}
-                        className="px-3 py-1 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(product.id)}
-                        className="px-3 py-1 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="text-center text-gray-500 py-4">
-                    No products found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {products.length > 0 ? (
+            products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onEdit={() => handleEditClick(product)}
+                onDelete={() => handleDeleteProduct(product.id)}
+              />
+            ))
+          ) : (
+            <div className="col-span-full text-center py-8">
+              <div className="text-gray-500">No products found</div>
+            </div>
+          )}
         </div>
       )}
 

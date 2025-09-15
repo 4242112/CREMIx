@@ -1,56 +1,83 @@
 import React from "react";
-import { Lead } from "../../services/LeadService";
 
 const LeadCard = ({ lead, onViewDetails, onEdit, onConvert, onDelete }) => {
+  // Generate initials from name
+  const getInitials = (name) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Generate random avatar colors similar to the design
+  const getAvatarColor = (name) => {
+    const colors = [
+      'bg-blue-500',
+      'bg-green-500', 
+      'bg-purple-500',
+      'bg-orange-500',
+      'bg-red-500',
+      'bg-indigo-500',
+      'bg-pink-500',
+      'bg-yellow-500'
+    ];
+    const index = name.charCodeAt(0) % colors.length;
+    return colors[index];
+  };
+
   return (
-    <div className="bg-white shadow-md rounded-lg border border-gray-200">
-      {/* Header */}
-      <div className="flex justify-between items-center px-4 py-3 rounded-t-lg" style={{ backgroundColor: '#2e4a7a', color: 'white' }}>
-        <h5 className="text-lg font-semibold">{lead.name}</h5>
-        {lead.createdDate && (
-          <small className="text-sm">
-            <strong>Created on: {lead.createdDate}</strong>
-          </small>
-        )}
-      </div>
-
-      {/* Body */}
-      <div className="px-4 py-3" style={{ backgroundColor: '#f0f4fa' }}>
-        <div className="space-y-1 mb-3">
-          <div><strong>Phone: </strong>{lead.phoneNumber}</div>
-          <div><strong>Email: </strong>{lead.email}</div>
-          <div><strong>Assigned To: </strong>{lead.assignedTo || 'Super Admin'}</div>
-          {lead.requirement && <div><strong>Interested In: </strong>{lead.requirement}</div>}
-          {lead.expectedRevenue !== undefined && <div><strong>Expected Revenue: </strong>₹{lead.expectedRevenue.toFixed(2)}</div>}
-          {lead.conversionProbability !== undefined && <div><strong>Conversion Probability: </strong>{lead.conversionProbability}%</div>}
+    <div className="bg-white rounded-2xl border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden group">
+      {/* Main Content */}
+      <div className="p-6">
+        <div className="flex items-start gap-4 mb-6">
+          {/* Avatar */}
+          <div className={`w-16 h-16 ${getAvatarColor(lead.name)} rounded-full flex items-center justify-center text-white font-semibold text-lg flex-shrink-0`}>
+            {getInitials(lead.name)}
+          </div>
+          
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {lead.name}
+            </h3>
+            <p className="text-gray-500 text-sm">
+              {lead.email}
+            </p>
+          </div>
         </div>
-
-        {/* Buttons */}
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={onViewDetails}
-            className="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 flex items-center gap-1"
-          >
-            👁️ View Details
-          </button>
-          <button
-            onClick={onEdit}
-            className="px-3 py-1 rounded bg-gray-500 text-white text-sm hover:bg-gray-600 flex items-center gap-1"
-          >
-            ✏️ Edit
-          </button>
-          <button
-            onClick={onConvert}
-            className="px-3 py-1 rounded bg-green-500 text-white text-sm hover:bg-green-600 flex items-center gap-1"
-          >
-            ➡️ Convert To Opportunity
-          </button>
-          <button
-            onClick={onDelete}
-            className="px-3 py-1 rounded bg-red-600 text-white text-sm hover:bg-red-700 flex items-center gap-1"
-          >
-            🗑️ Delete
-          </button>
+        
+        {/* View Details Button */}
+        <button
+          onClick={onViewDetails}
+          className="text-teal-600 hover:text-teal-700 text-sm font-medium transition-colors duration-200 mb-4 block"
+        >
+          View Details
+        </button>
+        
+        {/* Action buttons - show on hover */}
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="flex gap-2 pt-2 border-t border-gray-100">
+            <button
+              onClick={onEdit}
+              className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-xs hover:bg-gray-200 transition-colors"
+            >
+              Edit
+            </button>
+            <button
+              onClick={onConvert}
+              className="px-3 py-1.5 rounded-lg bg-green-100 text-green-700 text-xs hover:bg-green-200 transition-colors"
+            >
+              Convert
+            </button>
+            <button
+              onClick={onDelete}
+              className="px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-xs hover:bg-red-200 transition-colors"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>

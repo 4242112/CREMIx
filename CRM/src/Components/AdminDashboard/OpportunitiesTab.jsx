@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Pagination from "../common/Pagination";
@@ -13,7 +13,7 @@ const OpportunitiesTab = ({ onError }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const opportunitiesPerPage = 10;
 
-  const fetchOpportunities = async () => {
+  const fetchOpportunities = useCallback(async () => {
     setLoadingOpportunities(true);
     try {
       const response = await fetch("http://localhost:8080/api/opportunities");
@@ -28,17 +28,27 @@ const OpportunitiesTab = ({ onError }) => {
     } finally {
       setLoadingOpportunities(false);
     }
-  };
+  }, [onError]);
 
   useEffect(() => {
     fetchOpportunities();
-  }, []);
+  }, [fetchOpportunities]);
 
   useEffect(() => {
     setFilteredOpportunities(
       opportunities.filter(
         (opportunity) =>
+          // Search in lead name or customer email for quote requests
           opportunity.lead?.name
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          opportunity.customer?.name
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          opportunity.customer?.email
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          opportunity.title
             ?.toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
           opportunity.lead?.assignedTo
@@ -53,22 +63,30 @@ const OpportunitiesTab = ({ onError }) => {
     try {
       const exportData = opportunities.map((opportunity) => ({
         ID: opportunity.id || "",
-        Customer: opportunity.lead?.name || "N/A",
-        "Assigned To": opportunity.lead?.assignedTo || "Unassigned",
-        "Quotation Created": opportunity.quotationId ? "Yes" : "No",
-        "Created Date": opportunity.createdDate
-          ? new Date(opportunity.createdDate).toLocaleDateString()
+        Title: opportunity.title || `Opportunity for ${opportunity.lead?.name || opportunity.customer?.name || "Unknown"}`,
+        Description: opportunity.description || "",
+        Customer: opportunity.customer?.name || opportunity.lead?.name || "N/A",
+        "Customer Email": opportunity.customer?.email || opportunity.customerEmail || "",
+        Stage: opportunity.stage || "NEW",
+        Type: opportunity.lead ? "From Lead" : "Quote Request",
+        "Quotation Created": opportunity.quotation || opportunity.quotationId ? "Yes" : "No",
+        "Created Date": opportunity.createdAt || opportunity.createdDate
+          ? new Date(opportunity.createdAt || opportunity.createdDate).toLocaleDateString()
           : "",
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(exportData);
 
       worksheet["!cols"] = [
-        { wch: 5 },
-        { wch: 25 },
-        { wch: 20 },
-        { wch: 20 },
-        { wch: 15 },
+        { wch: 5 },  // ID
+        { wch: 30 }, // Title
+        { wch: 40 }, // Description
+        { wch: 25 }, // Customer
+        { wch: 30 }, // Customer Email
+        { wch: 10 }, // Stage
+        { wch: 15 }, // Type
+        { wch: 15 }, // Quotation Created
+        { wch: 15 }, // Created Date
       ];
 
       const workbook = XLSX.utils.book_new();
@@ -165,7 +183,7 @@ const OpportunitiesTab = ({ onError }) => {
       {/* Search box */}
       <input
         type="text"
-        placeholder="Search by customer or assigned to"
+        placeholder="Search by customer, title, or assigned to"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         className="w-full border rounded px-3 py-2 mb-4 focus:ring-2 focus:ring-indigo-500"
@@ -177,9 +195,11 @@ const OpportunitiesTab = ({ onError }) => {
           <thead>
             <tr className="bg-gray-100 text-left text-gray-700">
               <th className="px-4 py-2 border">ID</th>
+              <th className="px-4 py-2 border">Title/Description</th>
               <th className="px-4 py-2 border">Customer</th>
-              <th className="px-4 py-2 border">Assigned To</th>
-              <th className="px-4 py-2 border">Quotation Created</th>
+              <th className="px-4 py-2 border">Stage</th>
+              <th className="px-4 py-2 border">Type</th>
+              <th className="px-4 py-2 border">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -190,13 +210,65 @@ const OpportunitiesTab = ({ onError }) => {
               >
                 <td className="px-4 py-2 border">{opportunity.id}</td>
                 <td className="px-4 py-2 border">
-                  {opportunity.lead?.name || "N/A"}
+                  <div>
+                    <div className="font-medium">
+                      {opportunity.title || `Opportunity for ${opportunity.lead?.name || opportunity.customer?.name || "Unknown"}`}
+                    </div>
+                    {opportunity.description && (
+                      <div className="text-sm text-gray-600 mt-1">
+                        {opportunity.description.length > 50 
+                          ? `${opportunity.description.substring(0, 50)}...` 
+                          : opportunity.description}
+                      </div>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-2 border">
-                  {opportunity.lead?.assignedTo || "Unassigned"}
+                  <div>
+                    <div className="font-medium">
+                      {opportunity.customer?.name || opportunity.lead?.name || "N/A"}
+                    </div>
+                    {(opportunity.customer?.email || opportunity.customerEmail) && (
+                      <div className="text-sm text-gray-600">
+                        {opportunity.customer?.email || opportunity.customerEmail}
+                      </div>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-2 border">
-                  {opportunity.quotationId ? "Yes" : "No"}
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    opportunity.stage === 'NEW' ? 'bg-blue-100 text-blue-800' :
+                    opportunity.stage === 'WON' ? 'bg-green-100 text-green-800' :
+                    opportunity.stage === 'LOST' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {opportunity.stage || 'NEW'}
+                  </span>
+                </td>
+                <td className="px-4 py-2 border">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    opportunity.lead ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800'
+                  }`}>
+                    {opportunity.lead ? 'From Lead' : 'Quote Request'}
+                  </span>
+                </td>
+                <td className="px-4 py-2 border">
+                  <div className="flex gap-2">
+                    <button 
+                      className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                      onClick={() => {/* Add view details functionality */}}
+                    >
+                      View
+                    </button>
+                    {!opportunity.quotation && (
+                      <button 
+                        className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700"
+                        onClick={() => {/* Add create quotation functionality */}}
+                      >
+                        Create Quote
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

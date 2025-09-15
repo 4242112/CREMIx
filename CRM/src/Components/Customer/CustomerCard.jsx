@@ -1,112 +1,105 @@
 import React from "react";
 
 const CustomerCard = ({ customer, onViewDetails, onEdit, onDelete }) => {
+  // Generate initials from name
+  const getInitials = (name) => {
+    if (!name) return "CU";
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Generate random avatar colors
+  const getAvatarColor = (name) => {
+    const colors = [
+      'bg-blue-500',
+      'bg-green-500', 
+      'bg-purple-500',
+      'bg-orange-500',
+      'bg-red-500',
+      'bg-indigo-500',
+      'bg-pink-500',
+      'bg-yellow-500'
+    ];
+    const index = name ? name.charCodeAt(0) % colors.length : 0;
+    return colors[index];
+  };
 
   const getBadgeColor = () => {
     switch (customer.type) {
       case 'NEW':
-        return 'bg-green-500';
+        return 'bg-green-100 text-green-700';
       case 'EXISTING':
-        return 'bg-teal-500';
+        return 'bg-blue-100 text-blue-700';
       default:
-        return 'bg-gray-500';
+        return 'bg-gray-100 text-gray-700';
     }
   };
 
   return (
-    <div className="shadow-md border rounded-lg mb-4">
-      {/* Header */}
-      <div
-        className="flex justify-between items-center px-4 py-2 rounded-t-lg"
-        style={{ backgroundColor: '#2e4a7a', color: 'white' }}
-      >
-        <h5 className="text-lg font-semibold">{customer.name}</h5>
-        <span className={`text-sm px-2 py-1 rounded ${getBadgeColor()}`}>
-          {customer.type || 'UNKNOWN'}
-        </span>
-      </div>
-
-      {/* Body */}
-      <div className="p-4" style={{ backgroundColor: '#f0f4fa' }}>
-        <div className="mb-3">
-          <div className="mb-1">
-            <strong>Phone: </strong> {customer.phoneNumber}
+    <div className="bg-white rounded-2xl border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden group">
+      {/* Main Content */}
+      <div className="p-6">
+        <div className="flex items-start gap-4 mb-6">
+          {/* Avatar */}
+          <div className={`w-16 h-16 ${getAvatarColor(customer.name)} rounded-full flex items-center justify-center text-white font-semibold text-lg flex-shrink-0`}>
+            {getInitials(customer.name)}
           </div>
-          <div className="mb-1">
-            <strong>Email: </strong> {customer.email}
+          
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {customer.name}
+            </h3>
+            <p className="text-gray-500 text-sm mb-1">
+              {customer.email}
+            </p>
+            {customer.phoneNumber && (
+              <p className="text-gray-500 text-sm">
+                {customer.phoneNumber}
+              </p>
+            )}
           </div>
         </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-2">
-          {onViewDetails && (
-            <button
-              onClick={onViewDetails}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm flex items-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+        
+        {/* Status Badge */}
+        <div className="mb-4">
+          <span className={`px-3 py-1 rounded-full text-xs font-medium ${getBadgeColor()}`}>
+            {customer.type || 'UNKNOWN'}
+          </span>
+        </div>
+        
+        {/* View Details Button */}
+        <button
+          onClick={onViewDetails}
+          className="text-teal-600 hover:text-teal-700 text-sm font-medium transition-colors duration-200 mb-4 block"
+        >
+          View Details
+        </button>
+        
+        {/* Action buttons - show on hover */}
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="flex gap-2 pt-2 border-t border-gray-100">
+            {onEdit && (
+              <button
+                onClick={onEdit}
+                className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-xs hover:bg-gray-200 transition-colors"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 12H9m12 0c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z"
-                />
-              </svg>
-              View Details
-            </button>
-          )}
-
-          {onEdit && (
-            <button
-              onClick={onEdit}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm flex items-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+                Edit
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={onDelete}
+                className="px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-xs hover:bg-red-200 transition-colors"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5m-5-5l5-5m0 0l-5 5m5-5H13"
-                />
-              </svg>
-              Edit
-            </button>
-          )}
-
-          {onDelete && (
-            <button
-              onClick={onDelete}
-              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm flex items-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-              Delete
-            </button>
-          )}
+                Delete
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { CustomerType } from "../../services/CustomerService";
 import CustomerQuotation from "./CustomerQuotation";
 import CustomerTickets from "./CustomerTickets";
 import CustomerInvoices from "./CustomerInvoices";
-import { Customer, CustomerType } from "../../services/CustomerService";
+import CustomerProductCatalog from "./CustomerProductCatalog";
 
 const CustomerDashboard = () => {
   const location = useLocation();
@@ -21,6 +22,7 @@ const CustomerDashboard = () => {
   const [customerData, setCustomerData] = useState(null);
 
   useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
     const tab = queryParams.get("tab") || "quotations";
     setActiveTab(tab);
   }, [location.search]);
@@ -62,7 +64,8 @@ const CustomerDashboard = () => {
         setCustomerEmail(authData.email);
 
         setIsLoading(false);
-      } catch (err) {
+      } catch (error) {
+        console.error("Authentication error:", error);
         setError("Authentication error. Please login again.");
         setIsLoading(false);
       }
@@ -76,10 +79,12 @@ const CustomerDashboard = () => {
 
     switch (activeTab) {
       case "quotations":
+      case "quotation":
         return <CustomerQuotation customerId={customerId} customerEmail={customerEmail} />;
       case "tickets":
         return <CustomerTickets customerId={customerId} customerEmail={customerEmail} />;
       case "invoices":
+      case "invoice":
         return (
           <CustomerInvoices
             customerId={customerId}
@@ -87,10 +92,12 @@ const CustomerDashboard = () => {
             customerData={customerData}
           />
         );
+      case "products":
+        return <CustomerProductCatalog customerId={customerId} customerEmail={customerEmail} />;
       default:
         return (
           <div className="bg-yellow-100 text-yellow-800 px-4 py-3 rounded">
-            Unknown tab selected!
+            Unknown tab selected: "{activeTab}"
           </div>
         );
     }

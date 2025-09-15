@@ -76,9 +76,4 @@ const NotesService = {
   }
 };
 
-// Export types for use in components
-export const Note = {
-  // Type definitions for IDE support
-};
-
 export default NotesService;

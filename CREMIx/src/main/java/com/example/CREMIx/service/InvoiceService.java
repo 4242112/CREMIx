@@ -31,6 +31,12 @@ public interface InvoiceService {
      */
     List<InvoiceDTO> getInvoicesByEmail(String email);
     
+    /**
+     * Send an invoice to the customer via email
+     * @param invoiceId The ID of the invoice to send
+     */
+    void sendInvoiceToCustomer(Long invoiceId);
+    
     void deleteInvoice(Long id);
     String generateInvoiceNumber();
 }

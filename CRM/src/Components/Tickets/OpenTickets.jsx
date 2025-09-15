@@ -1,7 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import TicketService, { TicketStatus, formatDate } from "../../services/TicketService";
-// import AITicketService from "../../services/AITicketService"; // Commented out - AI features disabled
 import AuthService from "../../services/AuthService";
 import Pagination from "../common/Pagination";
 
@@ -15,12 +13,6 @@ const OpenTickets = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [ticketsPerPage] = useState(10);
-
-  // AI features - Commented out
-  // const [aiLoading, setAiLoading] = useState(false);
-  // const [aiError, setAiError] = useState(null);
-  // const [ticketAnalysis, setTicketAnalysis] = useState(null);
-  
   const [activeTab, setActiveTab] = useState("details");
 
   const currentEmployee = AuthService.getCurrentEmployee();
@@ -34,14 +26,15 @@ const OpenTickets = () => {
     setLoading(true);
     try {
       const allTickets = await TicketService.getAllTickets();
-      const openTickets = allTickets.filter(
-        (ticket) => ticket.status === TicketStatus.NEW
+      // Show only NEW status tickets
+      const newTickets = allTickets.filter(
+        (ticket) => ticket.status === TicketStatus.NEW || ticket.status === 'NEW'
       );
-      setTickets(openTickets);
+      setTickets(newTickets);
       setError(null);
     } catch (err) {
-      setError("Error loading open tickets. Please try again later.");
-      console.error("Error fetching open tickets:", err);
+      setError("Error loading tickets. Please try again later.");
+      console.error("Error fetching tickets:", err);
     } finally {
       setLoading(false);
     }
@@ -85,50 +78,16 @@ const OpenTickets = () => {
     }
   };
 
-  // AI features - Commented out for now
-  // const analyzeTicket = async () => {
-  //   if (!selectedTicket || !selectedTicket.id) return;
-
-  //   setAiLoading(true);
-  //   setAiError(null);
-
-  //   try {
-  //     const analysis = await AITicketService.analyzeTicket(selectedTicket.id);
-  //     setTicketAnalysis(analysis);
-  //   } catch (err) {
-  //     console.error("Error analyzing ticket:", err);
-  //     setAiError("Failed to analyze ticket. Please try again.");
-  //   } finally {
-  //     setAiLoading(false);
-  //   }
-  // };
-
-  // AI utility functions - Commented out
-  // const getSentimentBadge = (sentiment) => {
-  //   switch (sentiment?.toLowerCase()) {
-  //     case "positive":
-  //       return "bg-green-100 text-green-800";
-  //     case "negative":
-  //       return "bg-red-100 text-red-800";
-  //     case "neutral":
-  //       return "bg-gray-100 text-gray-800";
-  //     default:
-  //       return "bg-gray-100 text-gray-800";
-  //   }
-  // };
-
-  // const getUrgencyBadge = (urgency) => {
-  //   switch (urgency?.toLowerCase()) {
-  //     case "high":
-  //       return "bg-red-100 text-red-800";
-  //     case "medium":
-  //       return "bg-yellow-100 text-yellow-800";
-  //     case "low":
-  //       return "bg-green-100 text-green-800";
-  //     default:
-  //       return "bg-gray-100 text-gray-800";
-  //   }
-  // };
+  const handleEscalateTicket = async (ticketId) => {
+    try {
+      await TicketService.escalateTicket(ticketId);
+      fetchTickets(); // Refresh to remove escalated ticket from employee view
+      setError(null);
+    } catch (err) {
+      setError("Failed to escalate ticket. Please try again.");
+      console.error("Error escalating ticket:", err);
+    }
+  };
 
   const showAcceptButton = !isAdmin;
 
@@ -216,6 +175,13 @@ const OpenTickets = () => {
                           <i className="bi bi-check-circle"></i> Accept
                         </button>
                       )}
+                      <button
+                        onClick={() => handleEscalateTicket(ticket.id)}
+                        className="border border-red-500 text-red-500 px-2 py-1 rounded text-sm hover:bg-red-50"
+                        title="Escalate to Admin"
+                      >
+                        🚨 Escalate
+                      </button>
                     </td>
                   </tr>
                 ))}

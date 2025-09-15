@@ -24,7 +24,11 @@ import lombok.ToString;
 public class Ticket {
 
     public enum TicketStatus {
-        NEW, IN_PROGRESS, RESOLVED, CLOSED
+        NEW, IN_PROGRESS, RESOLVED, CLOSED, URGENT
+    }
+
+    public enum TicketPriority {
+        LOW, MEDIUM, HIGH, CRITICAL
     }
     
     @Id
@@ -47,6 +51,9 @@ public class Ticket {
     
     @Enumerated(EnumType.STRING)
     private TicketStatus status = TicketStatus.NEW;
+    
+    @Enumerated(EnumType.STRING)
+    private TicketPriority priority = TicketPriority.MEDIUM;
     
     @CreationTimestamp
     private LocalDateTime createdAt;

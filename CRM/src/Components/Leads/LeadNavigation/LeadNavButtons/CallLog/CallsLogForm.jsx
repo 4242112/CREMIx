@@ -1,5 +1,5 @@
 import React from 'react';
-import { CallLog, dateToDateTime } from '../../../../../services/CallLogService';
+import { dateToDateTime } from '../../../../../services/CallLogService';
 
 const CallsLogForm = ({ currentCall, setCurrentCall, handleSubmit, onCancel }) => {
     return (

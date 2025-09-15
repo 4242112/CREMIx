@@ -332,22 +332,28 @@ const ManageCustomers = () => {
 
       {/* Customer List */}
       {loading ? (
-        <div>Loading Customers...</div>
+        <div className="text-center py-8">
+          <div className="text-gray-500">Loading Customers...</div>
+        </div>
       ) : filteredCustomers.length === 0 ? (
-        <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded">
-          No {activeFilter !== "ALL" ? activeFilter.toLowerCase() : ""} customers found.
+        <div className="text-center py-8">
+          <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded">
+            No {activeFilter !== "ALL" ? activeFilter.toLowerCase() : ""} customers found.
+          </div>
         </div>
       ) : (
-        currentCustomers.map((customer) => (
-          <CustomerCard
-            key={customer.id}
-            customer={customer}
-            onViewDetails={() => handleViewDetails(customer)}
-            onEdit={() => handleEditCustomer(customer)}
-            onConvert={() => {}}
-            onDelete={() => handleDeleteCustomer(customer)}
-          />
-        ))
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {currentCustomers.map((customer) => (
+            <CustomerCard
+              key={customer.id}
+              customer={customer}
+              onViewDetails={() => handleViewDetails(customer)}
+              onEdit={() => handleEditCustomer(customer)}
+              onConvert={() => {}}
+              onDelete={() => handleDeleteCustomer(customer)}
+            />
+          ))}
+        </div>
       )}
 
       {/* Pagination */}

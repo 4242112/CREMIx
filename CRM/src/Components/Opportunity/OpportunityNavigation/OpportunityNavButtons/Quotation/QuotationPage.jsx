@@ -49,7 +49,13 @@ const QuotationPage = ({ opportunity }) => {
       setShowForm(false);
     } catch (err) {
       console.error("Failed to save quotation", err);
-      setError("Failed to save quotation. Please try again.");
+      
+      // Handle specific error for accepted quotations
+      if (err.response && err.response.status === 400) {
+        setError(err.response.data || "Cannot modify quotation that has been accepted or converted.");
+      } else {
+        setError("Failed to save quotation. Please try again.");
+      }
     } finally {
       setFormSubmitting(false);
     }
@@ -107,6 +113,11 @@ const QuotationPage = ({ opportunity }) => {
     }
   };
 
+  const isEditingAllowed = () => {
+    return quotation?.stage !== QuotationStage.ACCEPTED && 
+           quotation?.stage !== 'CONVERTED';
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-10">
@@ -116,6 +127,23 @@ const QuotationPage = ({ opportunity }) => {
   }
 
   if (showForm || !quotation) {
+    // Prevent showing form for accepted/converted quotations
+    if (quotation && !isEditingAllowed()) {
+      setShowForm(false);
+      setError("Cannot edit quotation that has been accepted or converted.");
+      // Return to the normal view
+      return (
+        <div className="text-center py-4">
+          <p className="text-red-600 mb-4">Cannot edit quotation that has been accepted or converted.</p>
+          <button 
+            onClick={() => setError(null)} 
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Back to Quotation
+          </button>
+        </div>
+      );
+    }
     return <QuotationForm onSubmit={handleCreateOrUpdate} opportunity={opportunity} quotation={quotation} />;
   }
 
@@ -180,8 +208,9 @@ const QuotationPage = ({ opportunity }) => {
             )}
             <button
               onClick={() => setShowForm(true)}
-              disabled={formSubmitting}
-              className="bg-gray-700 text-white px-3 py-1 rounded flex items-center disabled:opacity-50"
+              disabled={formSubmitting || !isEditingAllowed()}
+              className="bg-gray-700 text-white px-3 py-1 rounded flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+              title={!isEditingAllowed() ? "Cannot edit accepted or converted quotations" : "Edit Quotation"}
             >
               Edit Quotation
             </button>

@@ -24,9 +24,6 @@ const Login = () => {
   const [passwordError, setPasswordError] = useState(null);
   const [passwordTouched, setPasswordTouched] = useState(false);
 
-  const ADMIN_EMAIL = "admin@gmail.com";
-  const ADMIN_PASSWORD = "Admin@123";
-
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setError(null);
@@ -54,14 +51,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-
-    const passwordValidation = validatePassword(password);
-    if (!passwordValidation.isValid) {
-      setPasswordError(passwordValidation.message);
-      setPasswordTouched(true);
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -69,25 +58,17 @@ const Login = () => {
         const response = await AuthService.loginEmployee({ email, password });
         if (response.isAuthenticated) {
           setLoading(false);
-          navigate("/");
+          navigate("/"); // Redirect employees to MainLayout system
         } else {
           setError("Invalid credentials. Please try again.");
           setLoading(false);
         }
       } else if (activeTab === "admin") {
-        if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-          const adminAuthData = {
-            isAuthenticated: true,
-            adminId: 1,
-            adminName: "Admin",
-            email,
-            role: "Administrator",
-          };
-          localStorage.setItem("adminAuth", JSON.stringify(adminAuthData));
-          setTimeout(() => {
-            navigate("/");
-            setLoading(false);
-          }, 1000);
+        // Use the backend API for admin login
+        const response = await AuthService.loginAdmin({ email, password });
+        if (response.isAuthenticated) {
+          setLoading(false);
+          navigate("/admin/dashboard");
         } else {
           setError("Invalid admin credentials. Please try again.");
           setLoading(false);

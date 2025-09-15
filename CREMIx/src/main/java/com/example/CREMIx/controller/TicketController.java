@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
 
@@ -121,5 +122,29 @@ public class TicketController {
     public ResponseEntity<TicketDTO> denyTicket(@PathVariable Long id) {
         TicketDTO updatedTicket = ticketService.denyTicket(id);
         return ResponseEntity.ok(updatedTicket);
+    }
+
+    @PutMapping("/{id}/escalate")
+    public ResponseEntity<TicketDTO> escalateTicket(@PathVariable Long id) {
+        try {
+            System.out.println("Escalating ticket with ID: " + id);
+            TicketDTO updatedTicket = ticketService.escalateTicket(id);
+            System.out.println("Successfully escalated ticket: " + id);
+            return ResponseEntity.ok(updatedTicket);
+        } catch (EntityNotFoundException e) {
+            System.out.println("Ticket not found: " + e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            System.out.println("Error escalating ticket: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
+
+    @GetMapping("/escalated")
+    public ResponseEntity<List<TicketDTO>> getEscalatedTickets() {
+        List<TicketDTO> escalatedTickets = ticketService.getEscalatedTickets();
+        return ResponseEntity.ok(escalatedTickets);
     }
 }

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import TicketService, { TicketStatus, formatDate } from '../../services/TicketService';
-// import AITicketService from '../../services/AITicketService'; // Commented out - AI features disabled
 
 const InProgressTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -68,8 +67,42 @@ const InProgressTickets = () => {
     setActiveTab('details');
   };
 
-  const handleEditTicket = () => {
-    setViewMode('edit');
+  // Removed handleEditTicket as it's no longer needed - Done button now closes modal
+
+  const handleSaveDraft = async () => {
+    if (!selectedTicket || !customResponse.trim()) {
+      setError('Please enter a response before saving.');
+      return;
+    }
+
+    try {
+      // Save the draft response to the ticket
+      const updatedTicket = {
+        ...selectedTicket,
+        draftResponse: customResponse,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      await TicketService.updateTicket(selectedTicket.id, updatedTicket);
+      setError(null);
+      
+      // Show success message or update UI as needed
+      console.log('Draft saved successfully');
+      
+      // Optionally refresh the ticket data
+      fetchTickets();
+    } catch (err) {
+      setError('Failed to save draft. Please try again.');
+      console.error('Error saving draft:', err);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowTicketModal(false);
+    setSelectedTicket(null);
+    setCustomResponse('');
+    setViewMode('view');
+    setActiveTab('details');
   };
 
   const handleUpdateTicket = async () => {
@@ -125,11 +158,7 @@ const InProgressTickets = () => {
 
   // Removed AI-related functions since AITicketService is no longer available
 
-  const copyToClipboard = (text) => {
-    if (!text) return;
-    navigator.clipboard.writeText(text);
-    // You can add a toast/snackbar where you call this if desired
-  };
+  // Removed copyToClipboard function as Save button now saves to database
 
   return (
     <div className="p-4">
@@ -435,10 +464,10 @@ const InProgressTickets = () => {
                             ✖ Clear
                           </button>
                           <button
-                            onClick={() => copyToClipboard(customResponse)}
+                            onClick={handleSaveDraft}
                             className="text-sm px-3 py-1 rounded border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
                           >
-                            📋 Copy
+                            � Save
                           </button>
                         </div>
                       </div>
@@ -497,10 +526,10 @@ const InProgressTickets = () => {
                     Close
                   </button>
                   <button
-                    onClick={handleEditTicket}
+                    onClick={handleCloseModal}
                     className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
                   >
-                    ✎ Edit
+                    ✓ Done
                   </button>
                 </>
               ) : (

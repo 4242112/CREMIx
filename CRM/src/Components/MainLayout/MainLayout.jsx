@@ -1,28 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./HeaderComponents/Header";
-import Sidebar from "./SidebarComponents/Sidebar";
+import Sidebar_new from "./SidebarComponents/Sidebar_new";
+import ConnectionStatus from "../common/ConnectionStatus";
 
 const MainLayout = () => {
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <div className="flex flex-grow">
-        {/* Sidebar with fixed width */}
-        <div className="w-[200px] flex-shrink-0">
-          <Sidebar />
-        </div>
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-        {/* Main content area */}
-        <main
-          className="flex-grow p-3 bg-[#f5f7fa]"
-          style={{ minHeight: "calc(100vh - 56px)" }}
-        >
-          <div className="w-full">
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Fixed Sidebar */}
+      <Sidebar_new 
+        collapsed={sidebarCollapsed} 
+        setCollapsed={setSidebarCollapsed} 
+      />
+
+      {/* Main content area with dynamic left margin based on sidebar state */}
+      <div className={`flex flex-col min-h-screen transition-all duration-300 ${
+        sidebarCollapsed ? 'ml-20' : 'ml-64'
+      }`}>
+        <Header />
+        <main className="flex-1 p-6 overflow-auto">
+          <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>
         </main>
       </div>
+
+      {/* Connection Status Indicator */}
+      <ConnectionStatus />
     </div>
   );
 };

@@ -16,6 +16,7 @@ public class InvoiceDTO {
     private Long id;
     private String invoiceNumber;
     private String customerName;
+    private String customerEmail;
     private String employeeName;
     private Double amount;
     private String status;
@@ -65,6 +66,7 @@ public class InvoiceDTO {
         this.invoiceNumber = invoice.getInvoiceNumber();
 
         this.customerName = invoice.getCustomer() != null ? invoice.getCustomer().getName() : null;
+        this.customerEmail = invoice.getCustomer() != null ? invoice.getCustomer().getEmail() : null;
 
         this.employeeName = invoice.getEmployee() != null ? invoice.getEmployee().getName() : null;
 
@@ -101,6 +103,7 @@ public class InvoiceDTO {
         this.invoiceNumber = invoice.getInvoiceNumber();
 
         this.customerName = invoice.getCustomer() != null ? invoice.getCustomer().getName() : null;
+        this.customerEmail = invoice.getCustomer() != null ? invoice.getCustomer().getEmail() : null;
 
         this.employeeName = invoice.getEmployee() != null ? invoice.getEmployee().getName() : null;
 

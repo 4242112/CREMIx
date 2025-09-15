@@ -1,0 +1,129 @@
+Methods,API,Usage,Backend File,Fetched by Frontend File
+POST,/api/auth/register/customer,Register a new customer,AuthController.java,AuthService.js
+POST,/api/auth/login/employee,Authenticate employee login,AuthController.java,AuthService.js
+POST,/api/auth/login/customer,Authenticate customer login,AuthController.java,AuthService.js
+POST,/api/auth/login/admin,Authenticate admin login,AuthController.java,AuthService.js
+GET,/api/customers,Get all customers,CustomerController.java,CustomerService.js
+GET,/api/customers/{id},Get customer by ID,CustomerController.java,CustomerService.js
+GET,/api/customers/type/{type},Get customers by type,CustomerController.java,-
+GET,/api/customers/recycle-bin,Get deleted customers,CustomerController.java,-
+POST,/api/customers,Create a new customer,CustomerController.java,CustomerService.js
+PUT,/api/customers/{id},Update customer details,CustomerController.java,CustomerService.js
+POST,/api/customers/{id}/set-password,Set password for customer,CustomerController.java,-
+POST,/api/customers/{id}/register,Register customer,CustomerController.java,CustomerService.js
+GET,/api/customers/email/{email},Get customer by email,CustomerController.java,-
+PUT,/api/customers/restore/{id},Restore deleted customer,CustomerController.java,-
+DELETE,/api/customers/{id},Delete customer (soft delete),CustomerController.java,CustomerService.js
+DELETE,/api/customers/delete-permanent/{id},Permanently delete customer,CustomerController.java,-
+GET,/api/customers/search?q={query},Search customers,CustomerController.java,CustomerService.js
+GET,/api/customers/stats,Get customer statistics,CustomerController.java,CustomerService.js
+GET,/api/employees/names,Get all employee names,EmployeeController.java,EmployeeService.js
+GET,/api/employees,Get all employees,EmployeeController.java,EmployeeService.js
+POST,/api/employees,Create a new employee,EmployeeController.java,-
+PUT,/api/employees/{id},Update employee details,EmployeeController.java,-
+DELETE,/api/employees/{id},Delete employee,EmployeeController.java,-
+GET,/api/tickets,Get all tickets,TicketController.java,TicketService.js
+GET,/api/tickets/{id},Get ticket by ID,TicketController.java,TicketService.js
+POST,/api/tickets,Create a new ticket,TicketController.java,-
+POST,/api/tickets/customer/{customerId},Create ticket for customer,TicketController.java,TicketService.js
+PUT,/api/tickets/{id},Update ticket details,TicketController.java,TicketService.js
+PUT,/api/tickets/{id}/assign/{employeeId},Assign ticket to employee,TicketController.java,TicketService.js
+DELETE,/api/tickets/{id},Delete ticket,TicketController.java,TicketService.js
+GET,/api/tickets/customer/{customerId},Get tickets by customer ID,TicketController.java,TicketService.js
+GET,/api/tickets/customer/email/{email},Get tickets by customer email,TicketController.java,TicketService.js
+GET,/api/tickets/status/{status},Get tickets by status,TicketController.java,-
+PUT,/api/tickets/{id}/confirm,Approve ticket,TicketController.java,TicketService.js
+PUT,/api/tickets/{id}/deny,Deny ticket,TicketController.java,TicketService.js
+PUT,/api/tickets/{id}/escalate,Escalate ticket,TicketController.java,TicketService.js
+GET,/api/tickets/escalated,Get escalated tickets,TicketController.java,-
+GET,/api/tickets/customer/{customerId}/closed,Get closed tickets by customer,TicketController.java,TicketService.js
+GET,/api/leads,Get all leads,LeadController.java,LeadService.js
+GET,/api/leads/{id},Get lead by ID,LeadController.java,LeadService.js
+GET,/api/leads/recycle-bin,Get deleted leads,LeadController.java,-
+GET,/api/leads/employee/{employeeId},Get leads by employee,LeadController.java,-
+POST,/api/leads,Create a new lead,LeadController.java,LeadService.js
+PUT,/api/leads/{id},Update lead details,LeadController.java,LeadService.js
+PUT,/api/leads/restore/{id},Restore deleted lead,LeadController.java,-
+DELETE,/api/leads/{id},Delete lead (soft delete),LeadController.java,LeadService.js
+DELETE,/api/leads/delete-permanent/{id},Permanently delete lead,LeadController.java,-
+GET,/api/leads/stats,Get lead statistics,LeadController.java,LeadService.js
+GET,/api/leads/by-source,Get leads by source,LeadController.java,LeadService.js
+GET,/api/opportunities,Get all opportunities,OpportunityController.java,OpportunityService.js
+GET,/api/opportunities/recycle-bin,Get deleted opportunities,OpportunityController.java,OpportunityService.js
+GET,/api/opportunities/{id},Get opportunity by ID,OpportunityController.java,OpportunityService.js
+GET,/api/opportunities/employee/{employeeId},Get opportunities by employee,OpportunityController.java,OpportunityService.js
+POST,/api/opportunities/from-lead/{leadId},Create opportunity from lead,OpportunityController.java,OpportunityService.js
+PUT,/api/opportunities/{id},Update opportunity details,OpportunityController.java,OpportunityService.js
+PUT,/api/opportunities/restore/{id},Restore deleted opportunity,OpportunityController.java,OpportunityService.js
+DELETE,/api/opportunities/{id},Delete opportunity (soft delete),OpportunityController.java,OpportunityService.js
+DELETE,/api/opportunities/delete-permanent/{id},Permanently delete opportunity,OpportunityController.java,OpportunityService.js
+PUT,/api/opportunities/{id}/stage,Update opportunity stage,OpportunityController.java,OpportunityService.js
+GET,/api/opportunities/search?query={query},Search opportunities,OpportunityController.java,OpportunityService.js
+GET,/api/products,Get all products,ProductController.java,ProductService.js
+GET,/api/products/{id},Get product by ID,ProductController.java,ProductService.js
+POST,/api/products,Create a new product,ProductController.java,ProductService.js
+PUT,/api/products/{id},Update product details,ProductController.java,ProductService.js
+DELETE,/api/products/{id},Delete product,ProductController.java,ProductService.js
+GET,/api/products/search?name={name},Search products,ProductController.java,ProductService.js
+GET,/api/products/category/{category},Get products by category,ProductController.java,ProductService.js
+GET,/api/products/status/{status},Get products by status,ProductController.java,ProductService.js
+GET,/api/categories,Get all categories,CategoryController.java,CategoryService.js
+GET,/api/categories/{id},Get category by ID,CategoryController.java,CategoryService.js
+POST,/api/categories,Create a new category,CategoryController.java,CategoryService.js
+PUT,/api/categories/{id},Update category details,CategoryController.java,CategoryService.js
+DELETE,/api/categories/{id},Delete category,CategoryController.java,CategoryService.js
+GET,/api/categories/search?name={name},Search categories,CategoryController.java,CategoryService.js
+GET,/api/invoices,Get all invoices,InvoiceController.java,InvoiceService.js
+GET,/api/invoices/{id},Get invoice by ID,InvoiceController.java,InvoiceService.js
+GET,/api/invoices/customer/{customerId},Get invoices by customer,InvoiceController.java,InvoiceService.js
+DELETE,/api/invoices/{id},Delete invoice,InvoiceController.java,InvoiceService.js
+GET,/api/invoices/generate-invoice-number,Generate invoice number,InvoiceController.java,InvoiceService.js
+GET,/api/invoices/customer/email/{email},Get invoices by customer email,InvoiceController.java,InvoiceService.js
+POST,/api/invoices/customer/{customerId},Create invoice for customer,InvoiceController.java,InvoiceService.js
+PUT,/api/invoices/{id},Update invoice details,InvoiceController.java,InvoiceService.js
+POST,/api/invoices/from-quotation/{quotationId},Create invoice from quotation,InvoiceController.java,InvoiceService.js
+POST,/api/invoices/{id}/send,Send invoice to customer via email,InvoiceController.java,InvoiceService.js
+GET,/api/quotations/opportunity/{opportunityId},Get quotations by opportunity,QuotationController.java,QuotationService.js
+POST,/api/quotations/opportunity/{opportunityId},Create quotation for opportunity,QuotationController.java,QuotationService.js
+PUT,/api/quotations/{id},Update quotation details,QuotationController.java,QuotationService.js
+DELETE,/api/quotations/{id},Delete quotation,QuotationController.java,QuotationService.js
+POST,/api/quotations/{id}/send,Send quotation,QuotationController.java,QuotationService.js
+GET,/api/quotations/customer/{customerId},Get quotations by customer,QuotationController.java,QuotationService.js
+GET,/api/quotations/customer/email/{email},Get quotations by customer email,QuotationController.java,QuotationService.js
+GET,/api/quotations/customer/name/{name},Get quotations by customer name,QuotationController.java,QuotationService.js
+POST,/api/quotations/{id}/accept,Accept quotation,QuotationController.java,QuotationService.js
+POST,/api/quotations/{id}/reject,Reject quotation,QuotationController.java,QuotationService.js
+POST,/api/quotations/product-request,Create product request quotation,QuotationController.java,QuotationService.js
+POST,/api/call-logs,Create a new call log,CallLogController.java,CallLogService.js
+GET,/api/call-logs/{id},Get call log by ID,CallLogController.java,CallLogService.js
+GET,/api/call-logs,Get all call logs,CallLogController.java,CallLogService.js
+GET,/api/call-logs/customer/{customerId},Get call logs by customer,CallLogController.java,CallLogService.js
+GET,/api/call-logs/customer/email/{email},Get call logs by customer email,CallLogController.java,CallLogService.js
+GET,/api/call-logs/employee/{employeeId},Get call logs by employee,CallLogController.java,CallLogService.js
+PUT,/api/call-logs/{id},Update call log details,CallLogController.java,CallLogService.js
+DELETE,/api/call-logs/{id},Delete call log,CallLogController.java,CallLogService.js
+GET,/api/call-logs/type/{callType},Get call logs by type,CallLogController.java,CallLogService.js
+GET,/api/call-logs/customer/{customerId}/type/{callType},Get call logs by customer and type,CallLogController.java,CallLogService.js
+GET,/api/call-logs/customer/email/{email}/type/{callType},Get call logs by customer email and type,CallLogController.java,CallLogService.js
+GET,/api/call-logs/date-range,Get call logs by date range,CallLogController.java,CallLogService.js
+GET,/api/call-logs/customer/{customerId}/date-range,Get call logs by customer and date range,CallLogController.java,CallLogService.js
+GET,/api/call-logs/customer/email/{email}/date-range,Get call logs by customer email and date range,CallLogController.java,CallLogService.js
+GET,/api/notes,Get all notes,NoteController.java,NotesService.js
+GET,/api/notes/{location}/{id},Get notes by location and ID,NoteController.java,NotesService.js
+POST,/api/notes,Create a new note,NoteController.java,NotesService.js
+PUT,/api/notes/{id},Update note details,NoteController.java,NotesService.js
+DELETE,/api/notes/{id},Delete note,NoteController.java,NotesService.js
+GET,/api/dashboard,Get dashboard data,DashboardController.java,DashboardService.js
+GET,/api/dashboard/growth,Get growth data,DashboardController.java,DashboardService.js
+GET,/api/dashboard/leads-by-source,Get leads by source data,DashboardController.java,DashboardService.js
+GET,/api/dashboard/products-by-category,Get products by category data,DashboardController.java,DashboardService.js
+GET,/api/dashboard/opportunities-by-stage,Get opportunities by stage data,DashboardController.java,DashboardService.js
+GET,/api/leads/count,Get leads count,DashboardController.java,DashboardService.js
+GET,/api/opportunities/count,Get opportunities count,DashboardController.java,DashboardService.js
+GET,/api/customers/count,Get customers count,DashboardController.java,DashboardService.js
+GET,/api/invoices/total,Get total invoices,DashboardController.java,DashboardService.js
+GET,/api/invoices/average,Get average invoices,DashboardController.java,DashboardService.js
+POST,/api/password-reset/request,Request password reset,PasswordResetController.java,-
+GET,/api/password-reset/validate,Validate password reset token,PasswordResetController.java,-
+POST,/api/password-reset/reset,Reset password,PasswordResetController.java,-
+GET,/api/health,Health check,HealthController.java,apiClient.js

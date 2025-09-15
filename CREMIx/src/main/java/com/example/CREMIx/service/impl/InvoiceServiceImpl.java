@@ -237,4 +237,30 @@ public class InvoiceServiceImpl implements InvoiceService {
     public List<InvoiceDTO> getInvoicesByEmail(String email) {
         return invoiceRepository.findByCustomerEmail(email);
     }
+    
+    @Override
+    @Transactional
+    public void sendInvoiceToCustomer(Long invoiceId) {
+        // Find the invoice
+        InvoiceDTO invoice = invoiceRepository.findInvoiceById(invoiceId)
+                .orElseThrow(() -> new RuntimeException("Invoice not found with id: " + invoiceId));
+        
+        // Get customer information
+        String customerEmail = invoice.getCustomerEmail();
+        String customerName = invoice.getCustomerName();
+        
+        if (customerEmail == null || customerEmail.trim().isEmpty()) {
+            throw new RuntimeException("Customer email not found for this invoice");
+        }
+        
+        // Send email notification to the customer
+        try {
+            emailService.sendInvoiceNotification(customerEmail, customerName, invoice);
+            System.out.println("Invoice sent successfully to customer: " + customerEmail);
+        } catch (Exception e) {
+            System.err.println("Failed to send invoice email to customer: " + customerEmail);
+            System.err.println("Error: " + e.getMessage());
+            throw new RuntimeException("Failed to send invoice email: " + e.getMessage());
+        }
+    }
 }

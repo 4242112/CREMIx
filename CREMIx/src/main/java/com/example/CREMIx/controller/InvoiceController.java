@@ -81,4 +81,21 @@ public class InvoiceController {
     public ResponseEntity<List<InvoiceDTO>> getInvoicesByEmail(@PathVariable String email) {
         return ResponseEntity.ok(invoiceService.getInvoicesByEmail(email));
     }
+    
+    /**
+     * Send/share an invoice to the customer via email
+     * @param id The ID of the invoice to send
+     * @return Success message
+     */
+    @org.springframework.web.bind.annotation.PostMapping("/{id}/send")
+    public ResponseEntity<String> sendInvoiceToCustomer(@PathVariable Long id) {
+        try {
+            invoiceService.sendInvoiceToCustomer(id);
+            return ResponseEntity.ok("Invoice sent successfully to customer");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to send invoice: " + e.getMessage());
+        }
+    }
 }

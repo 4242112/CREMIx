@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:8080/api/tickets';
+import apiClient from './apiClient.js';
 
 // Ticket status enum
 export const TicketStatus = {
@@ -8,13 +6,13 @@ export const TicketStatus = {
   IN_PROGRESS: 'IN_PROGRESS',
   CLOSED: 'CLOSED',
   RESOLVED: 'RESOLVED',
-  ESCALATED: 'ESCALATED'
+  URGENT: 'URGENT'
 };
 
 export const TicketService = {
   getAllTickets: async () => {
     try {
-      const response = await axios.get(API_URL);
+      const response = await apiClient.get('/tickets');
       return response.data;
     } catch (error) {
       console.error('Error fetching tickets:', error);
@@ -24,7 +22,7 @@ export const TicketService = {
 
   getTicketsByCustomerId: async (customerId) => {
     try {
-      const response = await axios.get(`${API_URL}/customer/${customerId}`);
+      const response = await apiClient.get(`/tickets/customer/${customerId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching tickets for customer ID ${customerId}:`, error);
@@ -34,7 +32,7 @@ export const TicketService = {
 
   getTicketById: async (id) => {
     try {
-      const response = await axios.get(`${API_URL}/${id}`);
+      const response = await apiClient.get(`/tickets/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching ticket ${id}:`, error);
@@ -47,7 +45,7 @@ export const TicketService = {
       if (!ticket.status) {
         ticket.status = 'NEW';
       }
-      const response = await axios.post(`${API_URL}/customer/${customerId}`, ticket);
+      const response = await apiClient.post(`/tickets/customer/${customerId}`, ticket);
       return response.data;
     } catch (error) {
       console.error('Error creating ticket:', error);
@@ -57,7 +55,7 @@ export const TicketService = {
 
   getTicketsByEmail: async (email) => {
     try {
-      const response = await axios.get(`${API_URL}/customer/email/${email}`);
+      const response = await apiClient.get(`/tickets/customer/email/${email}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching tickets for email ${email}:`, error);
@@ -67,7 +65,7 @@ export const TicketService = {
 
   updateTicket: async (id, ticket) => {
     try {
-      const response = await axios.put(`${API_URL}/${id}`, ticket);
+      const response = await apiClient.put(`/tickets/${id}`, ticket);
       return response.data;
     } catch (error) {
       console.error(`Error updating ticket ${id}:`, error);
@@ -77,7 +75,7 @@ export const TicketService = {
 
   deleteTicket: async (id) => {
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await apiClient.delete(`/tickets/${id}`);
     } catch (error) {
       console.error(`Error deleting ticket ${id}:`, error);
       throw error;
@@ -86,7 +84,7 @@ export const TicketService = {
 
   assignTicketToEmployee: async (ticketId, employeeId) => {
     try {
-      const response = await axios.put(`${API_URL}/${ticketId}/assign/${employeeId}`);
+      const response = await apiClient.put(`/tickets/${ticketId}/assign/${employeeId}`);
       return response.data;
     } catch (error) {
       console.error(`Error assigning ticket ${ticketId} to employee ${employeeId}:`, error);
@@ -96,7 +94,7 @@ export const TicketService = {
 
   escalateTicket: async (ticketId) => {
     try {
-      const response = await axios.put(`${API_URL}/${ticketId}/escalate`);
+      const response = await apiClient.put(`/tickets/${ticketId}/escalate`);
       return response.data;
     } catch (error) {
       console.error(`Error escalating ticket ${ticketId}:`, error);
@@ -106,7 +104,7 @@ export const TicketService = {
 
   confirmTicketResolution: async (ticketId) => {
     try {
-      const response = await axios.put(`${API_URL}/${ticketId}/confirm`);
+      const response = await apiClient.put(`/tickets/${ticketId}/confirm`);
       return response.data;
     } catch (error) {
       console.error(`Error confirming resolution for ticket ${ticketId}:`, error);
@@ -116,7 +114,7 @@ export const TicketService = {
 
   denyTicketResolution: async (ticketId, feedback) => {
     try {
-      const response = await axios.put(`${API_URL}/${ticketId}/deny`, { feedback });
+      const response = await apiClient.put(`/tickets/${ticketId}/deny`, { feedback });
       return response.data;
     } catch (error) {
       console.error(`Error denying resolution for ticket ${ticketId}:`, error);
@@ -126,7 +124,7 @@ export const TicketService = {
 
   getClosedTickets: async (customerId) => {
     try {
-      const response = await axios.get(`${API_URL}/customer/${customerId}/closed`);
+      const response = await apiClient.get(`/tickets/customer/${customerId}/closed`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching closed tickets for customer ${customerId}:`, error);

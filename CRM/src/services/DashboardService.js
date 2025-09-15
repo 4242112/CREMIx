@@ -1,10 +1,4 @@
-/* eslint-disable no-undef */
-import axios from 'axios';
-
-const API_URL = 'http://localhost:8080/api/dashboard';
-
-// Configure axios defaults
-axios.defaults.timeout = 10000; // 10 seconds timeout
+import apiClient from './apiClient.js';
 
 const DashboardService = {
   /**
@@ -13,11 +7,10 @@ const DashboardService = {
    */
   checkAPIHealth: async () => {
     try {
-      const response = await axios.get(`${API_URL}/health`);
-      console.log('API health check response:', response.data);
-      return response.status === 200;
+      await apiClient.get('/dashboard');
+      return true;
     } catch (error) {
-      console.error('API health check failed:', error);
+      console.error('Dashboard API health check failed:', error);
       return false;
     }
   },
@@ -28,42 +21,11 @@ const DashboardService = {
    */
   getDashboardData: async () => {
     try {
-      console.log('Fetching dashboard data from:', API_URL);
-      const response = await axios.get(API_URL);
-      console.log('Dashboard data response:', response.data);
-
-      if (!response.data || typeof response.data !== 'object') {
-        throw new Error('Invalid response format');
-      }
-
+      const response = await apiClient.get('/dashboard');
       return response.data;
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-
-      // Retry once after 1 second
-      try {
-        console.log('Retrying dashboard data fetch...');
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const retryResponse = await axios.get(API_URL);
-        console.log('Retry dashboard data response:', retryResponse.data);
-        return retryResponse.data;
-      } catch (retryError) {
-        console.error('Retry failed:', retryError);
-        // Fallback data
-        return {
-          totalLeads: 0,
-          totalOpportunities: 0,
-          totalCustomers: 0,
-          totalSales: 0,
-          averageOrderValue: 0,
-          leadsBySource: [],
-          productsByCategory: [],
-          opportunitiesByStage: [],
-          customerGrowth: 0,
-          leadGrowth: 0,
-          salesGrowth: 0
-        };
-      }
+      throw error;
     }
   },
 
@@ -73,7 +35,7 @@ const DashboardService = {
    */
   getLeadsCount: async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/leads/count');
+      const response = await apiClient.get('/leads/count');
       return response.data;
     } catch (error) {
       console.error('Error fetching leads count:', error);
@@ -87,7 +49,7 @@ const DashboardService = {
    */
   getOpportunitiesCount: async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/opportunities/count');
+      const response = await apiClient.get('/opportunities/count');
       return response.data;
     } catch (error) {
       console.error('Error fetching opportunities count:', error);
@@ -101,7 +63,7 @@ const DashboardService = {
    */
   getCustomersCount: async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/customers/count');
+      const response = await apiClient.get('/customers/count');
       return response.data;
     } catch (error) {
       console.error('Error fetching customers count:', error);
@@ -115,7 +77,7 @@ const DashboardService = {
    */
   getTotalSales: async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/invoices/total');
+      const response = await apiClient.get('/invoices/total');
       return response.data;
     } catch (error) {
       console.error('Error fetching total sales:', error);
@@ -129,7 +91,7 @@ const DashboardService = {
    */
   getAverageOrderValue: async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/invoices/average');
+      const response = await apiClient.get('/invoices/average');
       return response.data;
     } catch (error) {
       console.error('Error fetching average order value:', error);
@@ -139,12 +101,12 @@ const DashboardService = {
 
   /**
    * Get leads by source
-   * @returns {Promise<Array<{source: string, value: number}>>}
+   * @returns {Promise<Array>}
    */
   getLeadsBySource: async () => {
     try {
-      const response = await axios.get(`${API_URL}/leads-by-source`);
-      return response.data.map(item => ({ source: item.source, value: item.value }));
+      const response = await apiClient.get('/dashboard/leads-by-source');
+      return response.data;
     } catch (error) {
       console.error('Error fetching leads by source:', error);
       return [];
@@ -153,12 +115,12 @@ const DashboardService = {
 
   /**
    * Get products by category
-   * @returns {Promise<Array<{category: string, value: number}>>}
+   * @returns {Promise<Array>}
    */
   getProductsByCategory: async () => {
     try {
-      const response = await axios.get(`${API_URL}/products-by-category`);
-      return response.data.map(item => ({ category: item.category, value: item.value }));
+      const response = await apiClient.get('/dashboard/products-by-category');
+      return response.data;
     } catch (error) {
       console.error('Error fetching products by category:', error);
       return [];
@@ -167,12 +129,12 @@ const DashboardService = {
 
   /**
    * Get opportunities by stage
-   * @returns {Promise<Array<{stage: string, value: number}>>}
+   * @returns {Promise<Array>}
    */
   getOpportunitiesByStage: async () => {
     try {
-      const response = await axios.get(`${API_URL}/opportunities-by-stage`);
-      return response.data.map(item => ({ stage: item.stage, value: item.value }));
+      const response = await apiClient.get('/dashboard/opportunities-by-stage');
+      return response.data;
     } catch (error) {
       console.error('Error fetching opportunities by stage:', error);
       return [];
@@ -181,11 +143,11 @@ const DashboardService = {
 
   /**
    * Get growth data (customers, leads, sales)
-   * @returns {Promise<{customers: number, leads: number, sales: number}>}
+   * @returns {Promise<Object>}
    */
   getGrowthData: async () => {
     try {
-      const response = await axios.get(`${API_URL}/growth`);
+      const response = await apiClient.get('/dashboard/growth');
       return response.data;
     } catch (error) {
       console.error('Error fetching growth data:', error);

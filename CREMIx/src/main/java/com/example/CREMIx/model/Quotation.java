@@ -11,6 +11,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import lombok.Data;
@@ -55,6 +57,11 @@ public class Quotation {
 
     @Enumerated(EnumType.STRING)
     private Stage stage = Stage.DRAFT;
+    
+    // Direct relationship to Customer for multiple quotations per customer
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
     
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

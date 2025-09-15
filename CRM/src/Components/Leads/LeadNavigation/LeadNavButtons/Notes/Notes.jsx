@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lead } from "../../../../../services/LeadService";
-import NotesService, { Note, NoteLocation } from '../../../../../services/NotesService';
+import NotesService, { NoteLocation } from '../../../../../services/NotesService';
 
 const NotesButton = ({ lead }) => {
   const [editingNoteId, setEditingNoteId] = useState(null);

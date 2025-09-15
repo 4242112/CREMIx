@@ -75,7 +75,7 @@ const MyTickets = () => {
         return 'bg-green-500 text-white';
       case TicketStatus.CLOSED:
         return 'bg-gray-500 text-white';
-      case TicketStatus.ESCALATED:
+      case TicketStatus.URGENT:
         return 'bg-red-500 text-white';
       default:
         return 'bg-gray-200 text-gray-700';
@@ -100,7 +100,7 @@ const MyTickets = () => {
     if (!selectedTicket) return;
 
     try {
-      if (selectedTicket.status === TicketStatus.ESCALATED) {
+      if (selectedTicket.status === TicketStatus.URGENT) {
         await TicketService.escalateTicket(selectedTicket.id);
         setError(null);
         setSuccessMessage('Ticket has been escalated to admin successfully.');
@@ -235,7 +235,7 @@ const MyTickets = () => {
                                 </button>
                                 <button
                                   onClick={() => {
-                                    setSelectedTicket({ ...ticket, status: TicketStatus.ESCALATED });
+                                    setSelectedTicket({ ...ticket, status: TicketStatus.URGENT });
                                     handleSaveTicket();
                                   }}
                                   className="inline-flex items-center px-3 py-1 text-sm border border-red-500 rounded hover:bg-red-50"
@@ -351,7 +351,7 @@ const MyTickets = () => {
                       >
                         <option value={TicketStatus.IN_PROGRESS}>In Progress</option>
                         <option value={TicketStatus.RESOLVED}>Resolved</option>
-                        <option value={TicketStatus.ESCALATED}>Escalate to Admin</option>
+                        <option value={TicketStatus.URGENT}>Escalate to Admin</option>
                       </select>
                     </div>
                   </div>

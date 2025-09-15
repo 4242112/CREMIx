@@ -152,17 +152,47 @@ const ManageLeads = () => {
     setMessage(null);
     setError(null);
     try {
+      // Transform frontend form data to match backend DTO structure
+      const leadData = {
+        // Customer fields (flattened in DTO)
+        name: data.name,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        address: data.address || "",
+        city: data.city || "",
+        state: data.state || "",
+        zipCode: data.zipCode ? parseInt(data.zipCode) : null,
+        country: data.country || "",
+        website: data.website || "",
+        
+        // Lead fields
+        requirement: data.requirement || "",
+        assignedTo: data.assignedTo,
+        source: data.source,
+        conversionProbability: parseInt(data.conversionProbability) || 0,
+        expectedRevenue: parseFloat(data.expectedRevenue) || 0.0,
+      };
+
+      console.log('Sending lead data:', leadData); // Debug log
+
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(leadData),
       });
-      if (!response.ok) throw new Error("Failed to save lead");
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server response:', response.status, errorText);
+        throw new Error(`Failed to save lead: ${response.status} - ${errorText}`);
+      }
+      
       setMessage("Lead saved successfully!");
       setShowLeadForm(false);
       await fetchLeads();
-    } catch {
-      setError("Error saving lead. Please try again.");
+    } catch (error) {
+      console.error('Error saving lead:', error);
+      setError(`Error saving lead: ${error.message}`);
     }
   };
 
@@ -300,20 +330,26 @@ const ManageLeads = () => {
 
       {/* Lead List */}
       {loading ? (
-        <div>Loading leads...</div>
+        <div className="text-center py-8">
+          <div className="text-gray-500">Loading leads...</div>
+        </div>
       ) : currentLeads.length === 0 ? (
-        <div className="text-gray-500">No leads found.</div>
+        <div className="text-center py-8">
+          <div className="text-gray-500">No leads found.</div>
+        </div>
       ) : (
-        currentLeads.map((lead) => (
-          <LeadCard
-            key={lead.id}
-            lead={lead}
-            onViewDetails={() => handleViewDetails(lead)}
-            onEdit={() => handleEditLead(lead)}
-            onConvert={() => handleConvertLead(lead)}
-            onDelete={() => handleDeleteLead(lead)}
-          />
-        ))
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {currentLeads.map((lead) => (
+            <LeadCard
+              key={lead.id}
+              lead={lead}
+              onViewDetails={() => handleViewDetails(lead)}
+              onEdit={() => handleEditLead(lead)}
+              onConvert={() => handleConvertLead(lead)}
+              onDelete={() => handleDeleteLead(lead)}
+            />
+          ))}
+        </div>
       )}
 
       {/* Modals */}

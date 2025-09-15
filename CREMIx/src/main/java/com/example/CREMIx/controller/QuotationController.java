@@ -32,12 +32,40 @@ public class QuotationController {
         );
     }
 
+    /**
+     * Create a quotation directly for a customer (not linked to an opportunity)
+     * This allows multiple quotations per customer
+     * 
+     * @param customerId The ID of the customer
+     * @param quotationDTO The quotation data
+     * @return The created quotation
+     */
+    @PostMapping("/customer/{customerId}")
+    public ResponseEntity<?> createQuotationForCustomer(
+            @PathVariable Long customerId,
+            @RequestBody QuotationDTO quotationDTO) {
+        try {
+            return new ResponseEntity<>(
+                    quotationService.createQuotationForCustomer(customerId, quotationDTO),
+                    HttpStatus.CREATED
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateQuotation(
             @PathVariable Long id,
             @RequestBody QuotationDTO quotationDTO) {
-                System.out.println("QuotationDTO: " + quotationDTO);
-        return ResponseEntity.ok(quotationService.updateQuotation(id, quotationDTO));
+        try {
+            System.out.println("QuotationDTO: " + quotationDTO);
+            return ResponseEntity.ok(quotationService.updateQuotation(id, quotationDTO));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**

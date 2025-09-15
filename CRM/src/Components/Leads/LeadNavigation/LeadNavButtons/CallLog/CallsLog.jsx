@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Lead } from "../../../../../services/LeadService";
 import CallsLogForm from "./CallsLogForm";
 import CallLogService from "../../../../../services/CallLogService";
 

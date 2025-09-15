@@ -40,6 +40,31 @@ public class EmployeeService {
         return convertToDTO(savedEmployee);
     }
     
+    public EmployeeDTO updateEmployee(Long id, Employee updatedEmployee) {
+        return employeeRepository.findById(id)
+                .map(employee -> {
+                    // Update basic fields
+                    if (updatedEmployee.getName() != null) {
+                        employee.setName(updatedEmployee.getName());
+                    }
+                    if (updatedEmployee.getEmail() != null) {
+                        employee.setEmail(updatedEmployee.getEmail());
+                    }
+                    if (updatedEmployee.getPhone() != null) {
+                        employee.setPhone(updatedEmployee.getPhone());
+                    }
+                    
+                    // Only update password if a new one is provided
+                    if (updatedEmployee.getHashedPassword() != null && !updatedEmployee.getHashedPassword().trim().isEmpty()) {
+                        employee.setHashedPassword(passwordEncoder.encode(updatedEmployee.getHashedPassword()));
+                    }
+                    
+                    Employee savedEmployee = employeeRepository.save(employee);
+                    return convertToDTO(savedEmployee);
+                })
+                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
+    }
+    
     public boolean deleteEmployee(Long id) {
         if (employeeRepository.existsById(id)) {
             employeeRepository.deleteById(id);

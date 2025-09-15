@@ -100,6 +100,17 @@ const InvoiceService = {
     }
   },
 
+  // Send invoice to customer via email
+  sendInvoiceToCustomer: async (invoiceId) => {
+    try {
+      const response = await axios.post(`${API_URL}/${invoiceId}/send`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error sending invoice ID ${invoiceId}:`, error);
+      throw error;
+    }
+  },
+
   // Calculate line item amount
   calculateLineItemAmount: (quantity, rate) => {
     return quantity * rate;

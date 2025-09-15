@@ -1,5 +1,4 @@
 import React from 'react';
-import { Lead } from "../../../../../services/LeadService";
 
 const ProfileButton = ({ lead }) => {
   if (!lead) return null;

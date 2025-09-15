@@ -15,6 +15,12 @@ const QuotationService = {
     return response.data;
   },
 
+  // Create a quotation directly for a customer (multiple quotations support)
+  createQuotationForCustomer: async (customerId, quotation) => {
+    const response = await axios.post(`${BASE_URL}/customer/${customerId}`, quotation);
+    return response.data;
+  },
+
   updateQuotation: async (id, quotation) => {
     const response = await axios.put(`${BASE_URL}/${id}`, quotation);
     return response.data;
@@ -51,6 +57,26 @@ const QuotationService = {
 
   rejectQuotation: async (id) => {
     const response = await axios.post(`${BASE_URL}/${id}/reject`);
+    return response.data;
+  },
+
+  // Create a quotation request for a product
+  createProductQuotationRequest: async (productId, customerId, customerEmail, quantity = 1) => {
+    const quotationData = {
+      title: `Product Quote Request`,
+      description: `Customer quote request for product ID: ${productId}`,
+      customerEmail: customerEmail,
+      customerId: customerId,
+      items: [{
+        productId: productId,
+        quantity: quantity,
+        unitPrice: 0 // Will be filled by admin
+      }],
+      stage: 'DRAFT',
+      total: 0
+    };
+    
+    const response = await axios.post(`${BASE_URL}/product-request`, quotationData);
     return response.data;
   }
 };
