@@ -1,11 +1,15 @@
 // FILE: src/Components/AdminDashboard/EscalatedTicketsTab.jsx
 import React, { useState, useEffect } from "react";
 import TicketService from "../../services/TicketService";
+import TicketResolutionModal from "../Tickets/TicketResolutionModal";
 
 const EscalatedTicketsTab = ({ onError }) => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const fetchEscalatedTickets = async () => {
     try {
@@ -38,6 +42,25 @@ const EscalatedTicketsTab = ({ onError }) => {
     }
   };
 
+  const handleWorkOnTicket = (ticket) => {
+    setSelectedTicket(ticket);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedTicket(null);
+  };
+
+  const handleResolutionSuccess = (message) => {
+    if (onError) {
+      // Use onError to show success message (assuming it can handle both error and success)
+      onError(message);
+    }
+    // Refresh tickets after successful resolution
+    fetchEscalatedTickets();
+  };
+
   useEffect(() => {
     const loadTickets = async () => {
       try {
@@ -64,6 +87,10 @@ const EscalatedTicketsTab = ({ onError }) => {
         setLoading(false);
       }
     };
+
+    // Get current user info from localStorage or default
+    const userInfo = JSON.parse(localStorage.getItem('user') || '{}');
+    setCurrentUser(userInfo);
 
     loadTickets();
   }, [onError]);
@@ -192,6 +219,23 @@ const EscalatedTicketsTab = ({ onError }) => {
                 </div>
               </div>
               
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end mt-3 gap-2">
+                {(ticket.status === 'URGENT' || ticket.status === 'NEW') && (
+                  <button
+                    onClick={() => handleWorkOnTicket(ticket)}
+                    className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  >
+                    🛠️ Work On This
+                  </button>
+                )}
+                <button
+                  className="px-3 py-1 text-xs border border-gray-300 text-gray-600 rounded hover:bg-gray-50 transition-colors"
+                >
+                  📄 View Details
+                </button>
+              </div>
+              
               {ticket.lastUpdated && (
                 <div className="mt-2 text-xs">
                   <span className="font-medium">Last Updated: </span>
@@ -202,6 +246,15 @@ const EscalatedTicketsTab = ({ onError }) => {
           ))}
         </div>
       )}
+
+      {/* Ticket Resolution Modal */}
+      <TicketResolutionModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        ticket={selectedTicket}
+        currentUser={currentUser}
+        onSuccess={handleResolutionSuccess}
+      />
     </div>
   );
 };

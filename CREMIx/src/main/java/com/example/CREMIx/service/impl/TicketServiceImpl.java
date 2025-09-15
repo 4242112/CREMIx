@@ -196,6 +196,11 @@ public class TicketServiceImpl implements TicketService {
             .orElseThrow(() -> new EntityNotFoundException("Ticket not found with id: " + ticketId));
         
         System.out.println("escalateTicket: " + ticketId);
+        
+        // Note: Frontend enforces that employees can only escalate IN_PROGRESS tickets
+        // while admins can escalate any non-URGENT ticket. Future enhancement could
+        // add role-based validation here when authentication system is fully implemented.
+        
         ticket.setStatus(TicketStatus.URGENT);
         ticket.setUpdatedAt(LocalDateTime.now());
         ticket = ticketRepository.save(ticket);

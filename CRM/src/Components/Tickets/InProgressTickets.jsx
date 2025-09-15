@@ -5,6 +5,7 @@ const InProgressTickets = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [escalating, setEscalating] = useState(null);
 
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
@@ -160,6 +161,21 @@ const InProgressTickets = () => {
 
   // Removed copyToClipboard function as Save button now saves to database
 
+  const handleEscalateTicket = async (ticketId) => {
+    setEscalating(ticketId);
+    try {
+      await TicketService.escalateTicket(ticketId);
+      setError(null);
+      setShowTicketModal(false); // Close modal on successful escalation
+      await fetchTickets(); // Refresh to remove escalated ticket from view
+    } catch (err) {
+      setError('Failed to escalate ticket. Please try again.');
+      console.error('Error escalating ticket:', err);
+    } finally {
+      setEscalating(null);
+    }
+  };
+
   return (
     <div className="p-4">
       {/* Header */}
@@ -238,12 +254,22 @@ const InProgressTickets = () => {
                       <td className="px-3 py-2 border align-top">{formatDate(ticket.createdAt)}</td>
                       <td className="px-3 py-2 border align-top">{formatDate(ticket.updatedAt)}</td>
                       <td className="px-3 py-2 border align-top">
-                        <button
-                          onClick={() => handleOpenTicket(ticket)}
-                          className="text-xs px-2 py-1 rounded border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
-                        >
-                          View
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleOpenTicket(ticket)}
+                            className="text-xs px-2 py-1 rounded border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => handleEscalateTicket(ticket.id)}
+                            disabled={escalating === ticket.id}
+                            className="text-xs px-2 py-1 rounded border border-red-500 text-red-500 hover:bg-red-500 hover:text-white disabled:opacity-50"
+                            title="Escalate to Admin"
+                          >
+                            {escalating === ticket.id ? '⏳ Escalating...' : '🚨 Escalate'}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -524,6 +550,13 @@ const InProgressTickets = () => {
                     className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100"
                   >
                     Close
+                  </button>
+                  <button
+                    onClick={() => handleEscalateTicket(selectedTicket.id)}
+                    disabled={escalating === selectedTicket.id}
+                    className="px-4 py-2 rounded border border-red-500 text-red-500 hover:bg-red-500 hover:text-white disabled:opacity-50"
+                  >
+                    {escalating === selectedTicket.id ? '⏳ Escalating...' : '🚨 Escalate to Admin'}
                   </button>
                   <button
                     onClick={handleCloseModal}

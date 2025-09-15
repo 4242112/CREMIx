@@ -50,9 +50,11 @@ public class Ticket {
     private Employee employee;
     
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private TicketStatus status = TicketStatus.NEW;
     
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private TicketPriority priority = TicketPriority.MEDIUM;
     
     @CreationTimestamp

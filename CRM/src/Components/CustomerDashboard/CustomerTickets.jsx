@@ -123,23 +123,6 @@ const CustomerTickets = ({ customerId, customerEmail }) => {
     }
   };
 
-  const handleEscalateTicket = async (ticketId) => {
-    if (!ticketId) return;
-    setProcessingAction(true);
-    try {
-      await TicketService.escalateTicket(ticketId);
-      setSuccessMessage("Ticket has been escalated to admin successfully!");
-      setShowTicketDetailsModal(false);
-      setTimeout(() => setSuccessMessage(null), 5000);
-      await fetchCustomerTickets();
-    } catch (err) {
-      console.error(err);
-      setError("Failed to escalate ticket. Please try again.");
-    } finally {
-      setProcessingAction(false);
-    }
-  };
-
   const getBadgeColor = (status) => {
     switch (status) {
       case TicketStatus.NEW:
@@ -256,16 +239,6 @@ const CustomerTickets = ({ customerId, customerEmail }) => {
                       >
                         View
                       </button>
-                      {ticket.status !== TicketStatus.CLOSED && 
-                       ticket.status !== TicketStatus.URGENT && (
-                        <button
-                          className="px-2 py-1 text-orange-600 border border-orange-600 rounded text-sm hover:bg-orange-50"
-                          onClick={() => handleEscalateTicket(ticket.id)}
-                          disabled={processingAction}
-                        >
-                          Escalate
-                        </button>
-                      )}
                     </div>
                   </td>
                 </tr>
@@ -373,26 +346,6 @@ const CustomerTickets = ({ customerId, customerEmail }) => {
                     disabled={processingAction}
                   >
                     Deny Resolution
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Escalation section for tickets that are not closed or already escalated */}
-            {selectedTicket.status !== TicketStatus.CLOSED && 
-             selectedTicket.status !== TicketStatus.URGENT && (
-              <div className="mt-3 border-t pt-3">
-                <h6 className="font-medium mb-1">Need Priority Attention?</h6>
-                <p className="mb-3 text-sm text-gray-600">
-                  If your issue is urgent or needs immediate attention, you can escalate this ticket to our admin team.
-                </p>
-                <div className="flex justify-end">
-                  <button
-                    className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
-                    onClick={() => handleEscalateTicket(selectedTicket.id)}
-                    disabled={processingAction}
-                  >
-                    {processingAction ? "Escalating..." : "Escalate to Admin"}
                   </button>
                 </div>
               </div>

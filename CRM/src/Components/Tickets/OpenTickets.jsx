@@ -78,17 +78,6 @@ const OpenTickets = () => {
     }
   };
 
-  const handleEscalateTicket = async (ticketId) => {
-    try {
-      await TicketService.escalateTicket(ticketId);
-      fetchTickets(); // Refresh to remove escalated ticket from employee view
-      setError(null);
-    } catch (err) {
-      setError("Failed to escalate ticket. Please try again.");
-      console.error("Error escalating ticket:", err);
-    }
-  };
-
   const showAcceptButton = !isAdmin;
 
   // Get current tickets for the page
@@ -175,13 +164,6 @@ const OpenTickets = () => {
                           <i className="bi bi-check-circle"></i> Accept
                         </button>
                       )}
-                      <button
-                        onClick={() => handleEscalateTicket(ticket.id)}
-                        className="border border-red-500 text-red-500 px-2 py-1 rounded text-sm hover:bg-red-50"
-                        title="Escalate to Admin"
-                      >
-                        🚨 Escalate
-                      </button>
                     </td>
                   </tr>
                 ))}

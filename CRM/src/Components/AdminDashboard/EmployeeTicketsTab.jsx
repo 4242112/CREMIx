@@ -297,14 +297,16 @@ const EmployeeTicketsTab = ({ onError, onSuccess }) => {
                           )}
                         </div>
                         
-                        {/* Escalation button */}
-                        <button
-                          onClick={() => handleEscalateTicket(ticket.id)}
-                          disabled={escalating === ticket.id}
-                          className="text-red-600 hover:text-red-900 transition-colors text-xs font-medium disabled:opacity-50"
-                        >
-                          {escalating === ticket.id ? '⏳ Escalating...' : '🚨 Escalate to Admin'}
-                        </button>
+                        {/* Escalation button - only for IN_PROGRESS tickets */}
+                        {ticket.status === 'IN_PROGRESS' && (
+                          <button
+                            onClick={() => handleEscalateTicket(ticket.id)}
+                            disabled={escalating === ticket.id}
+                            className="text-red-600 hover:text-red-900 transition-colors text-xs font-medium disabled:opacity-50"
+                          >
+                            {escalating === ticket.id ? '⏳ Escalating...' : '🚨 Escalate to Admin'}
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

@@ -2,6 +2,7 @@ import apiClient from './apiClient.js';
 
 // Ticket status enum
 export const TicketStatus = {
+  NEW: 'NEW',
   OPEN: 'OPEN',
   IN_PROGRESS: 'IN_PROGRESS',
   CLOSED: 'CLOSED',
@@ -98,6 +99,16 @@ export const TicketService = {
       return response.data;
     } catch (error) {
       console.error(`Error escalating ticket ${ticketId}:`, error);
+      throw error;
+    }
+  },
+
+  startWorkingOnTicket: async (ticketId) => {
+    try {
+      const response = await apiClient.put(`/tickets/${ticketId}`, { status: 'IN_PROGRESS' });
+      return response.data;
+    } catch (error) {
+      console.error(`Error starting work on ticket ${ticketId}:`, error);
       throw error;
     }
   },

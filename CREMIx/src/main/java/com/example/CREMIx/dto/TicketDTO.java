@@ -49,7 +49,7 @@ public class TicketDTO {
     private String createdAt; 
     private String updatedAt;  
     
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yy");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
     
     public TicketDTO() {
     }
