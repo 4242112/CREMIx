@@ -6,7 +6,7 @@ const EmployeeTicketsTab = ({ onError, onSuccess }) => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [filter, setFilter] = useState('NEW'); // ALL, NEW, IN_PROGRESS, RESOLVED, CLOSED
+  const [filter, setFilter] = useState('ALL'); // ALL, NEW, IN_PROGRESS, RESOLVED, CLOSED
   const [escalating, setEscalating] = useState(null);
 
   const fetchAllTickets = async () => {

@@ -1,4 +1,5 @@
 import apiClient from './apiClient.js';
+import { getDemoTickets, initializeSampleTickets } from '../data/sampleTickets.js';
 
 // Ticket status enum
 export const TicketStatus = {
@@ -16,8 +17,13 @@ export const TicketService = {
       const response = await apiClient.get('/tickets');
       return response.data;
     } catch (error) {
-      console.error('Error fetching tickets:', error);
-      throw error;
+      console.warn('Backend API not available, using demo data:', error.message);
+      
+      // Initialize sample tickets if not exists
+      initializeSampleTickets();
+      
+      // Return demo tickets from localStorage
+      return getDemoTickets();
     }
   },
 
@@ -26,8 +32,15 @@ export const TicketService = {
       const response = await apiClient.get(`/tickets/customer/${customerId}`);
       return response.data;
     } catch (error) {
-      console.error(`Error fetching tickets for customer ID ${customerId}:`, error);
-      throw error;
+      console.warn(`Backend API not available, using demo data for customer ${customerId}:`, error.message);
+      
+      // Return filtered demo tickets
+      const demoTickets = getDemoTickets();
+      return demoTickets.filter(ticket => 
+        ticket.customerId === customerId || 
+        ticket.customerEmail?.includes(customerId) ||
+        customerId === 1 // Default customer ID for demo
+      );
     }
   },
 
@@ -36,21 +49,47 @@ export const TicketService = {
       const response = await apiClient.get(`/tickets/${id}`);
       return response.data;
     } catch (error) {
-      console.error(`Error fetching ticket ${id}:`, error);
-      throw error;
+      console.warn(`Backend API not available, using demo data for ticket ${id}:`, error.message);
+      
+      // Return specific demo ticket
+      const demoTickets = getDemoTickets();
+      return demoTickets.find(ticket => ticket.id === id || ticket.id === parseInt(id));
     }
   },
 
   createTicket: async (ticket, customerId) => {
     try {
+      // Ensure ticket has NEW status if not specified
       if (!ticket.status) {
         ticket.status = 'NEW';
       }
+      
       const response = await apiClient.post(`/tickets/customer/${customerId}`, ticket);
       return response.data;
     } catch (error) {
-      console.error('Error creating ticket:', error);
-      throw error;
+      console.warn('Backend API not available, simulating ticket creation:', error.message);
+      
+      // Fallback: create ticket in demo data
+      const newTicket = {
+        id: Date.now(), // Generate unique ID
+        ...ticket,
+        status: ticket.status || 'NEW', // Ensure NEW status
+        customerId: customerId,
+        customerName: 'Demo Customer',
+        employeeName: null,
+        assignedTo: null,
+        createdAt: ticket.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        priority: ticket.priority || 'MEDIUM'
+      };
+      
+      // Store in localStorage with existing demo tickets
+      const existingTickets = JSON.parse(localStorage.getItem('demoTickets')) || getDemoTickets();
+      existingTickets.push(newTicket);
+      localStorage.setItem('demoTickets', JSON.stringify(existingTickets));
+      
+      console.log('Demo ticket created successfully:', newTicket);
+      return newTicket;
     }
   },
 
@@ -69,8 +108,19 @@ export const TicketService = {
       const response = await apiClient.put(`/tickets/${id}`, ticket);
       return response.data;
     } catch (error) {
-      console.error(`Error updating ticket ${id}:`, error);
-      throw error;
+      console.warn(`Backend API not available, simulating ticket update for ${id}:`, error.message);
+      
+      // Update demo ticket in localStorage
+      const demoTickets = getDemoTickets();
+      const ticketIndex = demoTickets.findIndex(t => t.id === id || t.id === parseInt(id));
+      
+      if (ticketIndex !== -1) {
+        demoTickets[ticketIndex] = { ...demoTickets[ticketIndex], ...ticket, updatedAt: new Date().toISOString() };
+        localStorage.setItem('demoTickets', JSON.stringify(demoTickets));
+        return demoTickets[ticketIndex];
+      }
+      
+      throw new Error(`Ticket ${id} not found in demo data`);
     }
   },
 

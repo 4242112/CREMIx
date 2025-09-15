@@ -21,6 +21,10 @@ const InProgressTickets = () => {
   
   const [customResponse, setCustomResponse] = useState('');
   const [activeTab, setActiveTab] = useState('details');
+  
+  // Work tab state variables
+  const [workNotes, setWorkNotes] = useState('');
+  const [assignedTo, setAssignedTo] = useState('');
 
   useEffect(() => {
     fetchTickets();
@@ -66,6 +70,14 @@ const InProgressTickets = () => {
     setShowTicketModal(true);
     setCustomResponse('');
     setActiveTab('details');
+  };
+
+  const handleWorkOnTicket = (ticket) => {
+    setSelectedTicket(ticket);
+    setViewMode('work');
+    setShowTicketModal(true);
+    setCustomResponse('');
+    setActiveTab('work');
   };
 
   // Removed handleEditTicket as it's no longer needed - Done button now closes modal
@@ -117,6 +129,113 @@ const InProgressTickets = () => {
     } catch (err) {
       setError('Failed to update ticket. Please try again.');
       console.error('Error updating ticket:', err);
+    }
+  };
+
+  // Work tab handlers
+  const handleStatusUpdate = async (newStatus) => {
+    if (!selectedTicket) return;
+
+    try {
+      const updatedTicket = {
+        ...selectedTicket,
+        status: newStatus,
+        lastUpdated: new Date().toISOString(),
+        ...(newStatus === 'RESOLVED' && { resolvedAt: new Date().toISOString() }),
+        ...(newStatus === 'CLOSED' && { closedAt: new Date().toISOString() })
+      };
+      
+      await TicketService.updateTicket(selectedTicket.id, updatedTicket);
+      setSelectedTicket(updatedTicket);
+      fetchTickets();
+      setError(null);
+      
+      console.log(`Ticket status updated to ${newStatus}`);
+    } catch (err) {
+      setError('Failed to update ticket status. Please try again.');
+      console.error('Error updating ticket status:', err);
+    }
+  };
+
+  const handleAddWorkNotes = async () => {
+    if (!selectedTicket || !workNotes.trim()) {
+      setError('Please enter work notes before saving.');
+      return;
+    }
+
+    try {
+      const currentNotes = selectedTicket.workNotes || [];
+      const newNote = {
+        id: Date.now(),
+        note: workNotes,
+        author: 'Current Employee', // In real app, get from auth context
+        timestamp: new Date().toISOString()
+      };
+
+      const updatedTicket = {
+        ...selectedTicket,
+        workNotes: [...currentNotes, newNote],
+        lastUpdated: new Date().toISOString()
+      };
+      
+      await TicketService.updateTicket(selectedTicket.id, updatedTicket);
+      setSelectedTicket(updatedTicket);
+      setWorkNotes('');
+      fetchTickets();
+      setError(null);
+      
+      console.log('Work notes added successfully');
+    } catch (err) {
+      setError('Failed to add work notes. Please try again.');
+      console.error('Error adding work notes:', err);
+    }
+  };
+
+  const handleAssignTicket = async () => {
+    if (!selectedTicket || !assignedTo) {
+      setError('Please select an employee to assign the ticket.');
+      return;
+    }
+
+    try {
+      const updatedTicket = {
+        ...selectedTicket,
+        assignedTo: assignedTo,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      await TicketService.updateTicket(selectedTicket.id, updatedTicket);
+      setSelectedTicket(updatedTicket);
+      setAssignedTo('');
+      fetchTickets();
+      setError(null);
+      
+      console.log(`Ticket assigned to ${assignedTo}`);
+    } catch (err) {
+      setError('Failed to assign ticket. Please try again.');
+      console.error('Error assigning ticket:', err);
+    }
+  };
+
+  const handlePriorityUpdate = async (newPriority) => {
+    if (!selectedTicket) return;
+
+    try {
+      const updatedTicket = {
+        ...selectedTicket,
+        priority: newPriority,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      await TicketService.updateTicket(selectedTicket.id, updatedTicket);
+      setSelectedTicket(updatedTicket);
+      fetchTickets();
+      setError(null);
+      
+      console.log(`Ticket priority updated to ${newPriority}`);
+    } catch (err) {
+      setError('Failed to update ticket priority. Please try again.');
+      console.error('Error updating ticket priority:', err);
     }
   };
 
@@ -262,6 +381,13 @@ const InProgressTickets = () => {
                             View
                           </button>
                           <button
+                            onClick={() => handleWorkOnTicket(ticket)}
+                            className="text-xs px-2 py-1 rounded border border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
+                            title="Work on this ticket"
+                          >
+                            🛠️ Work On
+                          </button>
+                          <button
                             onClick={() => handleEscalateTicket(ticket.id)}
                             disabled={escalating === ticket.id}
                             className="text-xs px-2 py-1 rounded border border-red-500 text-red-500 hover:bg-red-500 hover:text-white disabled:opacity-50"
@@ -286,7 +412,7 @@ const InProgressTickets = () => {
           <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold">
-                {viewMode === 'view' ? 'Ticket Details' : 'Edit Ticket'}
+                {viewMode === 'view' ? 'Ticket Details' : viewMode === 'work' ? '🛠️ Work on Ticket' : 'Edit Ticket'}
               </h2>
               <button
                 onClick={() => setShowTicketModal(false)}
@@ -298,7 +424,7 @@ const InProgressTickets = () => {
             </div>
 
             <div className="p-4">
-              {selectedTicket && viewMode === 'view' ? (
+              {selectedTicket && (viewMode === 'view' || viewMode === 'work') ? (
                 <>
                   {/* Tabs */}
                   <div>
@@ -315,6 +441,14 @@ const InProgressTickets = () => {
                       >
                         ✏️ Compose Response
                       </button>
+                      {viewMode === 'work' && (
+                        <button
+                          onClick={() => setActiveTab('work')}
+                          className={`py-2 px-3 -mb-px ${activeTab === 'work' ? 'border-b-2 border-green-500 font-semibold' : 'text-gray-600'}`}
+                        >
+                          🛠️ Work Actions
+                        </button>
+                      )}
                       {/* AI Suggestions Tab - Commented out until AITicketService is available
                       <button
                         onClick={() => setActiveTab('ai-suggestions')}
@@ -495,6 +629,112 @@ const InProgressTickets = () => {
                           >
                             � Save
                           </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'work' && (
+                      <div>
+                        <div className="space-y-4">
+                          {/* Status Update Section */}
+                          <div className="bg-gray-50 p-4 rounded-lg">
+                            <h4 className="font-semibold mb-3 text-gray-800">📝 Update Status</h4>
+                            <div className="flex gap-3">
+                              <button
+                                onClick={() => handleStatusUpdate('IN_PROGRESS')}
+                                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                              >
+                                Mark In Progress
+                              </button>
+                              <button
+                                onClick={() => handleStatusUpdate('RESOLVED')}
+                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                              >
+                                Mark Resolved
+                              </button>
+                              <button
+                                onClick={() => handleStatusUpdate('CLOSED')}
+                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                              >
+                                Close Ticket
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Work Notes Section */}
+                          <div className="bg-blue-50 p-4 rounded-lg">
+                            <h4 className="font-semibold mb-3 text-gray-800">💬 Add Work Notes</h4>
+                            <textarea
+                              rows={4}
+                              value={workNotes}
+                              onChange={(e) => setWorkNotes(e.target.value)}
+                              placeholder="Add internal notes about your work on this ticket..."
+                              className="w-full border rounded p-3 text-sm bg-white"
+                            />
+                            <div className="mt-2 flex justify-end">
+                              <button
+                                onClick={handleAddWorkNotes}
+                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                              >
+                                Add Notes
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Assignment Section */}
+                          <div className="bg-purple-50 p-4 rounded-lg">
+                            <h4 className="font-semibold mb-3 text-gray-800">👤 Assignment</h4>
+                            <div className="flex gap-3 items-center">
+                              <select
+                                value={assignedTo}
+                                onChange={(e) => setAssignedTo(e.target.value)}
+                                className="border rounded px-3 py-2 text-sm flex-1"
+                              >
+                                <option value="">Select Employee</option>
+                                <option value="john.doe">John Doe</option>
+                                <option value="jane.smith">Jane Smith</option>
+                                <option value="mike.wilson">Mike Wilson</option>
+                                <option value="sarah.brown">Sarah Brown</option>
+                              </select>
+                              <button
+                                onClick={handleAssignTicket}
+                                className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 text-sm"
+                              >
+                                Assign
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Priority Update */}
+                          <div className="bg-red-50 p-4 rounded-lg">
+                            <h4 className="font-semibold mb-3 text-gray-800">🔥 Priority</h4>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handlePriorityUpdate('LOW')}
+                                className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+                              >
+                                Low
+                              </button>
+                              <button
+                                onClick={() => handlePriorityUpdate('MEDIUM')}
+                                className="px-3 py-1 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600"
+                              >
+                                Medium
+                              </button>
+                              <button
+                                onClick={() => handlePriorityUpdate('HIGH')}
+                                className="px-3 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600"
+                              >
+                                High
+                              </button>
+                              <button
+                                onClick={() => handlePriorityUpdate('URGENT')}
+                                className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+                              >
+                                Urgent
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}

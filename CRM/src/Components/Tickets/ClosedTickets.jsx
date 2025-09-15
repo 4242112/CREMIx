@@ -22,7 +22,7 @@ const ClosedTickets = () => {
     try {
       const allTickets = await TicketService.getAllTickets();
       const closedTickets = allTickets.filter(
-        (ticket) => ticket.status === TicketStatus.CLOSED
+        (ticket) => ticket.status === TicketStatus.CLOSED || ticket.status === TicketStatus.RESOLVED
       );
       setTickets(closedTickets);
       setError(null);
@@ -65,7 +65,7 @@ const ClosedTickets = () => {
       <div className="flex justify-between items-center mb-4 p-3 rounded bg-[#1a2236] text-white shadow">
         <h3 className="flex items-center gap-2 text-lg font-semibold">
           <span className="material-icons">archive</span>
-          Closed Tickets
+          Closed & Resolved Tickets
         </h3>
         <button
           onClick={fetchTickets}

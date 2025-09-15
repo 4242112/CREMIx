@@ -5,6 +5,9 @@ import CustomerQuotation from "./CustomerQuotation";
 import CustomerTickets from "./CustomerTickets";
 import CustomerInvoices from "./CustomerInvoices";
 import CustomerProductCatalog from "./CustomerProductCatalog";
+import ChatBot from "../Chatbot/ChatBot";
+import ChatBotWidget from "../Chatbot/ChatBotWidget";
+import ChatBotTicketModal from "../Chatbot/ChatBotTicketModal";
 
 const CustomerDashboard = () => {
   const location = useLocation();
@@ -20,6 +23,10 @@ const CustomerDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [customerData, setCustomerData] = useState(null);
+  const [chatBotOpen, setChatBotOpen] = useState(false);
+  const [ticketModalOpen, setTicketModalOpen] = useState(false);
+  const [chatBotTicketData, setChatBotTicketData] = useState({});
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -73,6 +80,35 @@ const CustomerDashboard = () => {
 
     checkAuth();
   }, [navigate]);
+
+  const handleOpenChat = () => {
+    setChatBotOpen(true);
+  };
+
+  const handleCloseChat = () => {
+    setChatBotOpen(false);
+  };
+
+  const handleCreateTicket = (ticketData) => {
+    setChatBotTicketData(ticketData);
+    setTicketModalOpen(true);
+  };
+
+  const handleTicketModalClose = () => {
+    setTicketModalOpen(false);
+    setChatBotTicketData({});
+  };
+
+  const handleTicketSuccess = (message) => {
+    setSuccessMessage(message);
+    setTicketModalOpen(false);
+    setChatBotOpen(false);
+    
+    // Clear success message after 5 seconds
+    setTimeout(() => {
+      setSuccessMessage('');
+    }, 5000);
+  };
 
   const renderTabContent = () => {
     if (!customerId) return null;
@@ -132,6 +168,20 @@ const CustomerDashboard = () => {
 
   return (
     <div className="p-4 space-y-4">
+      {/* Success Message */}
+      {successMessage && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+          <span className="block sm:inline">{successMessage}</span>
+          <button
+            className="absolute top-0 bottom-0 right-0 px-4 py-3"
+            onClick={() => setSuccessMessage('')}
+          >
+            <span className="sr-only">Dismiss</span>
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-gray-800 text-white rounded-lg p-4 shadow-md">
         <h2 className="text-xl font-semibold">Customer Portal - {customerName}</h2>
@@ -141,6 +191,36 @@ const CustomerDashboard = () => {
       <div className="bg-white shadow rounded-lg p-4">
         {renderTabContent()}
       </div>
+
+      {/* Chatbot Widget */}
+      <ChatBotWidget onOpenChat={handleOpenChat} />
+
+      {/* Chatbot Modal */}
+      <ChatBot
+        isOpen={chatBotOpen}
+        onClose={handleCloseChat}
+        onCreateTicket={handleCreateTicket}
+        currentUser={{
+          id: customerId,
+          userId: customerId,
+          name: customerName,
+          email: customerEmail
+        }}
+      />
+
+      {/* Ticket Creation Modal */}
+      <ChatBotTicketModal
+        isOpen={ticketModalOpen}
+        onClose={handleTicketModalClose}
+        chatbotData={chatBotTicketData}
+        currentUser={{
+          id: customerId,
+          userId: customerId,
+          name: customerName,
+          email: customerEmail
+        }}
+        onSuccess={handleTicketSuccess}
+      />
     </div>
   );
 };
