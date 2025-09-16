@@ -1,17 +1,61 @@
+/**
+ * InProgressTickets.jsx
+ * 
+ * COMPONENT: Employee In-Progress Ticket Management
+ * 
+ * PURPOSE:
+ * - Display and manage tickets with IN_PROGRESS status
+ * - Provide employee tools for ticket processing and resolution
+ * - Handle ticket status updates, work notes, and assignments
+ * - Integrate with chatbot conversation context and customer communication
+ * 
+ * FEATURES:
+ * - Ticket list with filtering and sorting capabilities
+ * - Modal interface for detailed ticket view and editing
+ * - Tabbed interface: Details, Response Composer, Work Tools
+ * - Status management: Mark as resolved, closed, or reassign
+ * - Work notes system for internal collaboration
+ * - Employee assignment and priority management
+ * - Response drafting and customer communication tools
+ * 
+ * STATE MANAGEMENT:
+ * - tickets: Array of in-progress tickets from TicketService
+ * - selectedTicket: Currently viewed ticket in modal
+ * - viewMode: 'view', 'edit', or 'work' for different modal contexts
+ * - activeTab: Controls which tab is shown in modal ('details', 'response-composer', 'work')
+ * - workNotes: Internal notes for employee collaboration
+ * - customResponse: Draft responses to customers
+ * 
+ * WORKFLOW:
+ * 1. Employee views list of in-progress tickets
+ * 2. Clicks ticket to open detailed modal view
+ * 3. Can switch between Details, Response, and Work tabs
+ * 4. Work tab allows status updates, notes, assignments, priority changes
+ * 5. Response tab enables customer communication drafting
+ * 6. All changes sync with TicketService and refresh UI
+ * 
+ * INTEGRATION POINTS:
+ * - TicketService: Data fetching, updates, status changes
+ * - Modal System: Reusable modal for ticket details and actions
+ * - Employee Dashboard: Part of main employee workflow interface
+ */
+
 import React, { useState, useEffect } from 'react';
 import TicketService, { TicketStatus, formatDate } from '../../services/TicketService';
 
 const InProgressTickets = () => {
-  const [tickets, setTickets] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [escalating, setEscalating] = useState(null);
+  // TICKET DATA STATE
+  const [tickets, setTickets] = useState([]);           // List of in-progress tickets
+  const [loading, setLoading] = useState(true);         // Loading state for initial fetch
+  const [error, setError] = useState(null);             // Error handling for API failures
+  const [escalating, setEscalating] = useState(null);   // Track which ticket is being escalated
 
-  const [showTicketModal, setShowTicketModal] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState(null);
-  const [viewMode, setViewMode] = useState('view');
+  // MODAL STATE MANAGEMENT
+  const [showTicketModal, setShowTicketModal] = useState(false);  // Modal visibility
+  const [selectedTicket, setSelectedTicket] = useState(null);     // Current ticket in modal
+  const [viewMode, setViewMode] = useState('view');               // Modal mode: 'view', 'edit', 'work'
 
-  // AI features - Commented out
+  // AI FEATURES - Currently disabled, ready for future integration
   // const [suggestions, setSuggestions] = useState([]);
   // const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   // const [suggestionsError, setSuggestionsError] = useState(null);
@@ -19,13 +63,15 @@ const InProgressTickets = () => {
   // const [generating, setGenerating] = useState(false);
   // const [responseTone, setResponseTone] = useState('professional');
   
-  const [customResponse, setCustomResponse] = useState('');
-  const [activeTab, setActiveTab] = useState('details');
+  // CUSTOMER COMMUNICATION STATE
+  const [customResponse, setCustomResponse] = useState('');       // Draft customer response
+  const [activeTab, setActiveTab] = useState('details');         // Active modal tab
   
-  // Work tab state variables
-  const [workNotes, setWorkNotes] = useState('');
-  const [assignedTo, setAssignedTo] = useState('');
+  // WORK MANAGEMENT STATE
+  const [workNotes, setWorkNotes] = useState('');                // Internal work notes
+  const [assignedTo, setAssignedTo] = useState('');              // Employee assignment
 
+  // COMPONENT INITIALIZATION - Fetch tickets on mount
   useEffect(() => {
     fetchTickets();
   }, []);

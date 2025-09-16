@@ -1,32 +1,67 @@
-// Temporary sample data for testing closed tickets
+/**
+ * sampleTickets.js
+ * 
+ * DEMO DATA SYSTEM: Sample Ticket Management
+ * 
+ * PURPOSE:
+ * - Provides realistic sample data for development and demo environments
+ * - Enables full application testing without backend API dependency
+ * - Demonstrates complete ticket lifecycle with various statuses and scenarios
+ * - Supports localStorage persistence for session continuity
+ * 
+ * ARCHITECTURE:
+ * - Static sample data with diverse ticket types and statuses
+ * - localStorage integration for persistent demo state
+ * - Fallback system when backend API is unavailable
+ * - Integration with TicketService for seamless development experience
+ * 
+ * TICKET TYPES INCLUDED:
+ * - Closed tickets (completed customer issues)
+ * - Resolved tickets (pending customer confirmation) 
+ * - In-progress tickets (actively being worked on)
+ * - New tickets (awaiting assignment)
+ * - Various priorities: LOW, MEDIUM, HIGH, URGENT
+ * - Multiple sources: Chatbot, Manual, Email, Phone
+ * - Different categories: Login, Payment, Technical, General Support
+ * 
+ * USAGE:
+ * - TicketService.getAllTickets() falls back to this data
+ * - Components use this for filtering and display testing
+ * - New tickets created via chatbot are added to this collection
+ * - Provides realistic data for UI/UX development and testing
+ */
+
+// SAMPLE TICKET COLLECTION - Comprehensive test data covering all scenarios
 const sampleTickets = [
+  // CLOSED TICKET EXAMPLE - Complete lifecycle with resolution
   {
     id: 'TCK-1726419876543',
     subject: 'Login Issues - Unable to Access Account',
     description: 'Customer experiencing authentication problems after password reset. Tried multiple browsers and cleared cache. Issue persisted for 3 days.',
-    status: 'CLOSED',
-    priority: 'HIGH',
-    category: 'Login Issues',
+    status: 'CLOSED',                    // Final status - fully resolved
+    priority: 'HIGH',                    // Important customer issue
+    category: 'Login Issues',            // Categorization for routing/analytics
     customerName: 'John Smith',
     customerEmail: 'john.smith@example.com',
-    source: 'Chatbot',
+    source: 'Chatbot',                   // Created via chatbot interaction
     createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     resolvedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     closedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    employeeName: 'Sarah Johnson',
+    employeeName: 'Sarah Johnson',       // Assigned employee who resolved it
     resolution: 'Password reset completed and 2FA enabled for enhanced security.'
   },
+  // PAYMENT ISSUE EXAMPLE - Different category and source
   {
     id: 'TCK-1726419876544',
     subject: 'Payment Problems - Transaction Failed',
     description: 'Credit card payment failed during checkout. Customer tried multiple cards and payment methods. Error code: CC_001',
-    status: 'CLOSED', 
-    priority: 'MEDIUM',
-    category: 'Payment Problems',
+    status: 'CLOSED',                    // Successfully resolved payment issue
+    priority: 'MEDIUM',                  // Standard business priority
+    category: 'Payment Problems',        // Financial/billing category
     customerName: 'Emily Davis',
     customerEmail: 'emily.davis@example.com',
-    source: 'Manual',
+    source: 'Manual',                    // Created manually by employee
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     resolvedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),

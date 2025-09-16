@@ -1,22 +1,75 @@
+/**
+ * ChatBotTicketModal.jsx
+ * 
+ * COMPONENT: Chatbot-to-Ticket Creation Interface
+ * 
+ * PURPOSE:
+ * - Convert chatbot conversations into formal support tickets
+ * - Bridge the gap between automated chat and human support
+ * - Capture customer issues that require technical assistance
+ * - Integrate chatbot context with ticket management system
+ * 
+ * WORKFLOW:
+ * 1. Customer interacts with chatbot and requests human support
+ * 2. Chatbot determines issue requires ticket creation
+ * 3. This modal opens with pre-populated data from chat context
+ * 4. Customer can review/edit ticket details before submission
+ * 5. Ticket created with 'NEW' status and routed to employee dashboard
+ * 6. Customer receives confirmation with ticket ID for tracking
+ * 
+ * PROPS:
+ * - isOpen: Boolean controlling modal visibility
+ * - onClose: Function to close modal and return to chat
+ * - chatbotData: Object containing conversation context and suggested values
+ * - currentUser: Customer information for ticket attribution
+ * - onSuccess: Callback function for successful ticket creation
+ * 
+ * INTEGRATION POINTS:
+ * - TicketService: Creates tickets with proper NEW status and fallback handling
+ * - ChatBot: Receives conversation context and category suggestions
+ * - Customer Dashboard: Created tickets appear in customer ticket list
+ * - Employee Dashboard: New tickets appear in employee queue for processing
+ * 
+ * DATA FLOW:
+ * Chatbot Context → Form Pre-population → Validation → TicketService.createTicket() → 
+ * Demo/API Storage → Employee Queue → Customer Confirmation
+ * 
+ * FEATURES:
+ * - Form validation for required fields
+ * - Priority selection (LOW, MEDIUM, HIGH, URGENT)
+ * - Category classification for proper routing
+ * - Conversation summary inclusion in ticket description
+ * - Error handling with user-friendly messages
+ * - Loading states during submission
+ * - Source tracking ('CHATBOT') for analytics
+ */
+
 import React, { useState } from 'react';
 import TicketService from '../../services/TicketService'; // Enabled for proper integration
 
 const ChatBotTicketModal = ({ 
   isOpen, 
   onClose, 
-  chatbotData = {}, 
-  currentUser,
-  onSuccess 
+  chatbotData = {},    // Conversation context from chatbot
+  currentUser,         // Customer information
+  onSuccess            // Success callback for chat interface
 }) => {
+  // FORM STATE - Pre-populated from chatbot conversation
   const [formData, setFormData] = useState({
-    subject: chatbotData.category || '',
-    description: chatbotData.customerMessage || '',
-    priority: 'MEDIUM',
-    category: chatbotData.category || 'General Support'
+    subject: chatbotData.category || '',                    // Suggested subject from chat
+    description: chatbotData.customerMessage || '',        // Customer's message from chat
+    priority: 'MEDIUM',                                     // Default priority for chatbot tickets
+    category: chatbotData.category || 'General Support'    // Category classification
   });
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
+  
+  // UI STATE MANAGEMENT
+  const [submitting, setSubmitting] = useState(false);     // Prevent double submission
+  const [error, setError] = useState(null);                // Form validation and API errors
 
+  /**
+   * FORM INPUT HANDLER
+   * Updates form state as customer modifies pre-populated values
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -25,9 +78,15 @@ const ChatBotTicketModal = ({
     }));
   };
 
+  /**
+   * TICKET CREATION HANDLER
+   * Validates form data and creates ticket via TicketService
+   * Includes conversation context and ensures NEW status
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // VALIDATION: Ensure required fields are completed
     if (!formData.subject.trim() || !formData.description.trim()) {
       setError('Please fill in all required fields');
       return;
@@ -37,6 +96,7 @@ const ChatBotTicketModal = ({
     setError(null);
 
     try {
+      // TICKET DATA PREPARATION - Include chatbot context and conversation summary
       const ticketData = {
         subject: formData.subject,
         description: `${formData.description}\n\n--- Chatbot Conversation Summary ---\n${chatbotData.conversationSummary || 'Customer requested support via chatbot.'}`,
