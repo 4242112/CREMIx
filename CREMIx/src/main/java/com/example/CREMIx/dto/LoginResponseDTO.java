@@ -13,6 +13,7 @@ public class LoginResponseDTO {
     private String role;
     private Long customerId;
     private String customerName;
+    private String token; // JWT token field
     
     public LoginResponseDTO(Boolean isAuthenticated, Long userId, String name, String email, String role) {
         this.isAuthenticated = isAuthenticated;

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.CREMIx.dto.LoginRequestDTO;
 import com.example.CREMIx.dto.LoginResponseDTO;
 import com.example.CREMIx.dto.CustomerRegistrationDTO;
+import com.example.CREMIx.misc.JwtUtil;
 import com.example.CREMIx.model.Customer;
 import com.example.CREMIx.repository.CustomerRepository;
 import com.example.CREMIx.service.EmployeeService;
@@ -28,6 +29,9 @@ public class AuthController {
     
     @Autowired
     private CustomerRepository customerRepository;
+    
+    @Autowired
+    private JwtUtil jwtUtil;
     
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -84,6 +88,10 @@ public class AuthController {
         
         if (isAuthenticated) {
             var employee = employeeService.findByEmail(loginRequest.getEmail());
+            
+            // Generate JWT token
+            String token = jwtUtil.generateToken(employee.getEmail(), "EMPLOYEE", employee.getId());
+            
             LoginResponseDTO response = new LoginResponseDTO(
                 true,
                 employee.getId(),
@@ -91,6 +99,7 @@ public class AuthController {
                 employee.getEmail(),
                 "EMPLOYEE"
             );
+            response.setToken(token); // Add token to response
             return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.status(401).body(new LoginResponseDTO(false, null, null, null, null));
@@ -119,6 +128,9 @@ public class AuthController {
         boolean isAuthenticated = passwordEncoder.matches(loginRequest.getPassword(), customer.getPasswordHash());
         
         if (isAuthenticated) {
+            // Generate JWT token
+            String token = jwtUtil.generateToken(customer.getEmail(), "CUSTOMER", customer.getId());
+            
             LoginResponseDTO response = new LoginResponseDTO(
                 true,
                 customer.getId(),
@@ -128,6 +140,7 @@ public class AuthController {
             );
             response.setCustomerId(customer.getId());
             response.setCustomerName(customer.getName());
+            response.setToken(token); // Add token to response
             return ResponseEntity.ok(response);
         } else {
             // Invalid password
@@ -142,6 +155,9 @@ public class AuthController {
         String ADMIN_PASSWORD = "Admin@123";
         
         if (ADMIN_EMAIL.equals(loginRequest.getEmail()) && ADMIN_PASSWORD.equals(loginRequest.getPassword())) {
+            // Generate JWT token
+            String token = jwtUtil.generateToken("admin@gmail.com", "ADMIN", 1L);
+            
             LoginResponseDTO response = new LoginResponseDTO(
                 true,
                 1L, // Admin ID
@@ -149,9 +165,43 @@ public class AuthController {
                 "admin@gmail.com",
                 "ADMIN"
             );
+            response.setToken(token); // Add token to response
             return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.status(401).body(new LoginResponseDTO(false, null, null, null, null));
         }
+    }
+    
+    @PostMapping("/validate")
+    public ResponseEntity<LoginResponseDTO> validateToken(@RequestBody TokenValidationRequest request) {
+        try {
+            String token = request.getToken();
+            if (token != null && jwtUtil.validateToken(token)) {
+                String email = jwtUtil.extractEmail(token);
+                String role = jwtUtil.extractRole(token);
+                Long userId = jwtUtil.extractUserId(token);
+                
+                LoginResponseDTO response = new LoginResponseDTO(
+                    true,
+                    userId,
+                    email, // You might want to get actual name from DB
+                    email,
+                    role
+                );
+                response.setToken(token);
+                return ResponseEntity.ok(response);
+            }
+            return ResponseEntity.status(401).body(new LoginResponseDTO(false, null, null, null, null));
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(new LoginResponseDTO(false, null, null, null, null));
+        }
+    }
+    
+    // Simple DTO for token validation
+    public static class TokenValidationRequest {
+        private String token;
+        
+        public String getToken() { return token; }
+        public void setToken(String token) { this.token = token; }
     }
 }

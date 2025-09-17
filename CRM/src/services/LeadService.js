@@ -85,6 +85,36 @@ const LeadService = {
       console.error('Error fetching leads by source:', error);
       throw error;
     }
+  },
+
+  getRecycleBinLeads: async () => {
+    try {
+      const response = await apiClient.get('/leads/recycle-bin');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching recycle bin leads:', error);
+      throw error;
+    }
+  },
+
+  restoreLead: async (id) => {
+    try {
+      const response = await apiClient.put(`/leads/${id}/restore`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error restoring lead with id ${id}:`, error);
+      throw error;
+    }
+  },
+
+  permanentDeleteLead: async (id) => {
+    try {
+      await apiClient.delete(`/leads/${id}/permanent`);
+      return true;
+    } catch (error) {
+      console.error(`Error permanently deleting lead with id ${id}:`, error);
+      throw error;
+    }
   }
 };
 

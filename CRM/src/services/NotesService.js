@@ -1,4 +1,4 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 
 export const NoteLocation = {
   LEAD: 'LEAD',
@@ -6,12 +6,12 @@ export const NoteLocation = {
   CUSTOMER: 'CUSTOMER'
 };
 
-const BASE_URL = 'http://localhost:8080/api/notes';
+const BASE_URL = '/notes';
 
 const NotesService = {
   getAllNotes: async () => {
     try {
-      const response = await axios.get(BASE_URL);
+      const response = await apiClient.get(BASE_URL);
       return response.data;
     } catch (error) {
       console.error('Error fetching all notes:', error);
@@ -27,7 +27,7 @@ const NotesService = {
 
     try {
       console.log(`Fetching notes for ${location} ID: ${id}`);
-      const response = await axios.get(`${BASE_URL}/${location}/${id}`);
+      const response = await apiClient.get(`${BASE_URL}/${location}/${id}`);
       console.log(`Found ${response.data.length} notes for ${location} ID: ${id}`);
       return response.data;
     } catch (error) {
@@ -39,7 +39,7 @@ const NotesService = {
   createNote: async (note) => {
     try {
       console.log('Creating note:', note);
-      const response = await axios.post(BASE_URL, note);
+      const response = await apiClient.post(BASE_URL, note);
       console.log('Note created successfully:', response.data);
       return response.data;
     } catch (error) {
@@ -56,7 +56,7 @@ const NotesService = {
 
     try {
       console.log(`Updating note ID ${note.id}:`, note);
-      const response = await axios.put(`${BASE_URL}/${note.id}`, note);
+      const response = await apiClient.put(`${BASE_URL}/${note.id}`, note);
       console.log('Note updated successfully:', response.data);
       return response.data;
     } catch (error) {
@@ -68,7 +68,7 @@ const NotesService = {
   deleteNote: async (id) => {
     try {
       console.log(`Deleting note ID ${id}`);
-      await axios.delete(`${BASE_URL}/${id}`);
+      await apiClient.delete(`${BASE_URL}/${id}`);
       console.log(`Note ID ${id} deleted successfully`);
     } catch (error) {
       console.error(`Error deleting note ID ${id}:`, error);

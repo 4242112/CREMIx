@@ -80,57 +80,30 @@ const CustomerProductCatalog = ({ customerId, customerEmail }) => {
 
     setRequestingQuote(product.id);
     try {
-      // First create a lead for the quote request using the correct DTO structure
-      const leadData = {
-        // Customer fields (flattened in DTO)
-        customerId: customerId,
-        name: customerEmail.split('@')[0] || 'Customer',
-        email: customerEmail,
-        phoneNumber: '',
-        address: '',
-        city: '',
-        state: '',
-        zipCode: null,
-        country: '',
-        website: '',
-        
-        // Lead fields
-        requirement: `Quote request for ${product.name} - Product ID: ${product.id}`,
-        assignedTo: '', // Leave empty for auto-assignment by backend
-        source: 'WEBSITE',
-        conversionProbability: 80,
-        expectedRevenue: parseFloat(product.price) || 0.0
+      // Create a draft quotation for the customer with the selected product
+      const quotationData = {
+        title: `Quote Request for ${product.name}`,
+        description: `Customer quote request for ${product.name}`,
+        amount: parseFloat(product.price) || 0,
+        items: [{
+          quantity: 1,
+          discount: 0.0,
+          product: {
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            price: parseFloat(product.price) || 0,
+            category: product.category,
+            status: product.status
+          }
+        }],
+        stage: 'DRAFT'
       };
 
-      // Create the lead
-      const leadResponse = await fetch('http://localhost:8080/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(leadData)
-      });
+      await QuotationService.createQuotationForCustomer(customerId, quotationData);
 
-      if (!leadResponse.ok) {
-        const errorText = await leadResponse.text();
-        console.error('Lead creation failed:', leadResponse.status, errorText);
-        throw new Error(`Failed to create lead: ${leadResponse.status} - ${errorText}`);
-      }
-
-      const createdLead = await leadResponse.json();
-
-      // Now create opportunity from the lead
-      const opportunityResponse = await fetch(`http://localhost:8080/api/opportunities/from-lead/${createdLead.id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      if (opportunityResponse.ok) {
-        setSuccessMessage(`Quote request submitted for ${product.name}! We'll get back to you soon.`);
-        setTimeout(() => setSuccessMessage(""), 5000);
-      } else {
-        const errorText = await opportunityResponse.text();
-        console.error('Opportunity creation failed:', opportunityResponse.status, errorText);
-        throw new Error(`Failed to create opportunity: ${opportunityResponse.status} - ${errorText}`);
-      }
+      setSuccessMessage(`Quote request submitted for ${product.name}! A draft quotation has been created and saved to your quotations.`);
+      setTimeout(() => setSuccessMessage(""), 5000);
     } catch (error) {
       console.error('Error requesting quote:', error);
       setError(`Failed to request quote for ${product.name}. Please try again.`);

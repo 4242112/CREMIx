@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import EditOpportunity from "./Buttons/Edit";
 import DeleteOpportunity from "./Buttons/Delete";
@@ -7,8 +7,10 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import OpportunityForm from "./OpportunityForm";
 import Pagination from "../common/Pagination";
+import AuthService from "../../services/AuthService";
+import OpportunityService from "../../services/OpportunityService";
 
-const API_URL = "http://localhost:8080/api/opportunities";
+const API_URL = '/opportunities';
 
 const ManageOpportunity = () => {
   const navigate = useNavigate();
@@ -94,16 +96,31 @@ const ManageOpportunity = () => {
     }
   };
 
-  const fetchOpportunities = async () => {
+  const applyFilter = useCallback((filter, opportunities = Opportunities) => {
+    if (filter === "ALL") {
+      setFilteredOpportunities(opportunities);
+    } else if (filter === "WITH_QUOTATION") {
+      setFilteredOpportunities(opportunities.filter((o) => o.quotationId));
+    } else if (filter === "WITHOUT_QUOTATION") {
+      setFilteredOpportunities(opportunities.filter((o) => !o.quotationId));
+    }
+  }, [Opportunities]);
+
+  const fetchOpportunities = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(API_URL);
-      if (!res.ok) throw new Error(`Failed to fetch Opportunities: ${res.status}`);
-      const data = await res.json();
+      const data = await OpportunityService.getAllOpportunities();
       if (!Array.isArray(data)) throw new Error("API returned unexpected data format");
       data.reverse();
       setOpportunities(data);
-      applyFilter(activeFilter, data);
+      // Apply filter directly with the new data to avoid dependency issues
+      if (activeFilter === "ALL") {
+        setFilteredOpportunities(data);
+      } else if (activeFilter === "WITH_QUOTATION") {
+        setFilteredOpportunities(data.filter((o) => o.quotationId));
+      } else if (activeFilter === "WITHOUT_QUOTATION") {
+        setFilteredOpportunities(data.filter((o) => !o.quotationId));
+      }
     } catch (err) {
       setError(
         `Error fetching Opportunities: ${
@@ -113,17 +130,7 @@ const ManageOpportunity = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const applyFilter = (filter, opportunities = Opportunities) => {
-    if (filter === "ALL") {
-      setFilteredOpportunities(opportunities);
-    } else if (filter === "WITH_QUOTATION") {
-      setFilteredOpportunities(opportunities.filter((o) => o.quotationId));
-    } else if (filter === "WITHOUT_QUOTATION") {
-      setFilteredOpportunities(opportunities.filter((o) => !o.quotationId));
-    }
-  };
+  }, [activeFilter]);
 
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
@@ -133,7 +140,7 @@ const ManageOpportunity = () => {
 
   useEffect(() => {
     fetchOpportunities();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCloseOpportunityForm = () => setShowOpportunityForm(false);
   const handleCloseEditForm = () => {
@@ -147,17 +154,12 @@ const ManageOpportunity = () => {
 
   const handleSaveOpportunity = async (data) => {
     try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error("Failed to save Opportunity");
+      await OpportunityService.createOpportunity(data);
       setMessage("Opportunity saved successfully!");
       setShowOpportunityForm(false);
       await fetchOpportunities();
-    } catch {
-      setError("Error saving Opportunity. Please try again.");
+    } catch (error) {
+      setError(`Error saving Opportunity: ${error.message || "Please try again."}`);
     }
   };
 
@@ -173,35 +175,26 @@ const ManageOpportunity = () => {
 
   const handleUpdateOpportunity = async (data) => {
     try {
-      const response = await fetch(`${API_URL}/${data.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error("Failed to update Opportunity");
+      await OpportunityService.updateOpportunity(data.id, data);
       setMessage("Opportunity updated successfully!");
       setShowEditForm(false);
       setSelectedOpportunity(null);
       await fetchOpportunities();
-    } catch {
-      setError("Error updating Opportunity. Please try again.");
+    } catch (error) {
+      setError(`Error updating Opportunity: ${error.message || "Please try again."}`);
     }
   };
 
   const handleConfirmDelete = async () => {
     if (!selectedOpportunity) return;
     try {
-      const response = await fetch(`${API_URL}/${selectedOpportunity.id}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!response.ok) throw new Error("Failed to delete Opportunity");
+      await OpportunityService.deleteOpportunity(selectedOpportunity.id);
       setMessage("Opportunity moved to recycle bin successfully!");
       setShowDeleteForm(false);
       setSelectedOpportunity(null);
       await fetchOpportunities();
-    } catch {
-      setError("Error moving Opportunity to recycle bin. Please try again.");
+    } catch (error) {
+      setError(`Error moving Opportunity to recycle bin: ${error.message || "Please try again."}`);
     }
   };
 

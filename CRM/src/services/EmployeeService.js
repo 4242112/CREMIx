@@ -1,8 +1,8 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 import InvoiceService from './InvoiceService';
 import LeadService from './LeadService';
 
-const API_URL = 'http://localhost:8080/api/employees';
+const API_URL = '/employees';
 
 const EmployeeService = {
   /**
@@ -11,7 +11,7 @@ const EmployeeService = {
    */
   getAllEmployeeNames: async () => {
     try {
-      const response = await axios.get(`${API_URL}/names`);
+      const response = await apiClient.get(`${API_URL}/names`);
       return response.data;
     } catch (error) {
       console.error('Error fetching employee names:', error);
@@ -25,7 +25,7 @@ const EmployeeService = {
    */
   getAllEmployees: async () => {
     try {
-      const response = await axios.get(API_URL);
+      const response = await apiClient.get(API_URL);
       return response.data;
     } catch (error) {
       console.error('Error fetching employees:', error);

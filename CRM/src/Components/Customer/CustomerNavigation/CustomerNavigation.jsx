@@ -1,12 +1,11 @@
 import React from 'react';
-import { UserIcon, PencilIcon, DocumentTextIcon } from '@heroicons/react/24/solid';
 
 const CustomerNavigation = ({ activeTab, onTabChange }) => {
   const navItems = [
-    { id: 'quotation', label: 'Quotation', icon: <DocumentTextIcon className="w-6 h-6" /> },
-    { id: 'invoice', label: 'Invoice', icon: <DocumentTextIcon className="w-6 h-6" /> },
-    { id: 'products', label: 'Products', icon: <DocumentTextIcon className="w-6 h-6" /> },
-    { id: 'tickets', label: 'Tickets', icon: <DocumentTextIcon className="w-6 h-6" /> },
+    { id: "profile", label: "Profile", icon: "person" },
+    { id: "calls", label: "Calls", icon: "telephone" },
+    { id: "notes", label: "Notes", icon: "journal-text" },
+    { id: "quotation", label: "Quotation", icon: "file-earmark-text" },
   ];
 
   return (
@@ -17,16 +16,16 @@ const CustomerNavigation = ({ activeTab, onTabChange }) => {
           <div
             key={item.id}
             onClick={() => onTabChange(item.id)}
-            className={`flex items-center p-3 border-b cursor-pointer transition-colors ${
-              isActive
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+            className={`flex items-center p-2 border-b transition cursor-pointer ${
+              isActive ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"
             }`}
           >
-            <span className={`mr-2 ${isActive ? 'text-white' : 'text-blue-600'}`}>
-              {item.icon}
-            </span>
-            <span className="font-medium">{item.label}</span>
+            <i
+              className={`bi bi-${item.icon} mr-2 text-lg ${
+                isActive ? "text-white" : "text-blue-600"
+              }`}
+            ></i>
+            <span className="font-medium text-base">{item.label}</span>
           </div>
         );
       })}

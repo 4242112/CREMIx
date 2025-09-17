@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Pagination from "../common/Pagination";
+import OpportunityService from "../../services/OpportunityService";
 
 const OpportunitiesTab = ({ onError }) => {
   const [opportunities, setOpportunities] = useState([]);
@@ -16,10 +17,7 @@ const OpportunitiesTab = ({ onError }) => {
   const fetchOpportunities = useCallback(async () => {
     setLoadingOpportunities(true);
     try {
-      const response = await fetch("http://localhost:8080/api/opportunities");
-      if (!response.ok) throw new Error("Failed to fetch opportunities");
-
-      const data = await response.json();
+      const data = await OpportunityService.getAllOpportunities();
       setOpportunities(data);
       onError("");
     } catch (err) {

@@ -1,6 +1,6 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 
-const API_URL = 'http://localhost:8080/api/opportunities';
+const API_URL = '/opportunities';
 
 export const OpportunityStage = {
   NEW: "NEW",
@@ -15,7 +15,7 @@ const OpportunityService = {
 
   getAllOpportunities: async () => {
     try {
-      const response = await axios.get(`${API_URL}`);
+      const response = await apiClient.get(`${API_URL}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching opportunities:', error);
@@ -25,7 +25,7 @@ const OpportunityService = {
 
   getOpportunityById: async (id) => {
     try {
-      const response = await axios.get(`${API_URL}/${id}`);
+      const response = await apiClient.get(`${API_URL}/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching opportunity with ID ${id}:`, error);
@@ -35,7 +35,7 @@ const OpportunityService = {
 
   updateOpportunity: async (id, opportunity) => {
     try {
-      const response = await axios.put(`${API_URL}/${id}`, opportunity);
+      const response = await apiClient.put(`${API_URL}/${id}`, opportunity);
       return response.data;
     } catch (error) {
       console.error(`Error updating opportunity with ID ${id}:`, error);
@@ -45,15 +45,25 @@ const OpportunityService = {
 
   deleteOpportunity: async (id) => {
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await apiClient.delete(`${API_URL}/${id}`);
     } catch (error) {
       console.error(`Error deleting opportunity with ID ${id}:`, error);
     }
   },
 
+  createOpportunity: async (opportunity) => {
+    try {
+      const response = await apiClient.post(`${API_URL}`, opportunity);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating opportunity:', error);
+      return null;
+    }
+  },
+
   getRecycleBinOpportunities: async () => {
     try {
-      const response = await axios.get(`${API_URL}/recycle-bin`);
+      const response = await apiClient.get(`${API_URL}/recycle-bin`);
       return response.data;
     } catch (error) {
       console.error('Error fetching opportunities from recycle bin:', error);
@@ -63,7 +73,7 @@ const OpportunityService = {
 
   restoreOpportunity: async (id) => {
     try {
-      await axios.put(`${API_URL}/restore/${id}`);
+      await apiClient.put(`${API_URL}/restore/${id}`);
     } catch (error) {
       console.error(`Error restoring opportunity with ID ${id}:`, error);
     }
@@ -71,7 +81,7 @@ const OpportunityService = {
 
   permanentDeleteOpportunity: async (id) => {
     try {
-      await axios.delete(`${API_URL}/delete-permanent/${id}`);
+      await apiClient.delete(`${API_URL}/delete-permanent/${id}`);
     } catch (error) {
       console.error(`Error permanently deleting opportunity with ID ${id}:`, error);
     }
@@ -79,7 +89,7 @@ const OpportunityService = {
 
   convertLeadToOpportunity: async (leadId, opportunity) => {
     try {
-      const response = await axios.post(`${API_URL}/from-lead/${leadId}`, opportunity);
+      const response = await apiClient.post(`${API_URL}/from-lead/${leadId}`, opportunity);
       return response.data;
     } catch (error) {
       console.error(`Error converting lead ${leadId} to opportunity:`, error);
@@ -89,7 +99,7 @@ const OpportunityService = {
 
   updateOpportunityStage: async (id, stage) => {
     try {
-      const response = await axios.put(`${API_URL}/${id}/stage`, { stage });
+      const response = await apiClient.put(`${API_URL}/${id}/stage`, { stage });
       return response.data;
     } catch (error) {
       console.error(`Error updating stage for opportunity ${id}:`, error);
@@ -99,7 +109,7 @@ const OpportunityService = {
 
   searchOpportunities: async (query) => {
     try {
-      const response = await axios.get(`${API_URL}/search?query=${encodeURIComponent(query)}`);
+      const response = await apiClient.get(`${API_URL}/search?query=${encodeURIComponent(query)}`);
       return response.data;
     } catch (error) {
       console.error('Error searching opportunities:', error);
@@ -109,7 +119,7 @@ const OpportunityService = {
 
   getOpportunitiesByEmployee: async (employeeId) => {
     try {
-      const response = await axios.get(`${API_URL}/employee/${employeeId}`);
+      const response = await apiClient.get(`${API_URL}/employee/${employeeId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching opportunities for employee ${employeeId}:`, error);

@@ -8,6 +8,7 @@ import CustomerService from '../../services/CustomerService';
 import LeadService from '../../services/LeadService';
 import OpportunityService from '../../services/OpportunityService';
 import InvoiceService from '../../services/InvoiceService';
+import AuthService from '../../services/AuthService';
 
 const ModernDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -226,9 +227,22 @@ const ModernDashboard = () => {
     }
   };
 
+  // Check authentication and fetch data on component mount
   useEffect(() => {
-    // Fetch data only when component mounts (when user navigates to dashboard)
-    fetchRealTimeData();
+    const checkAuth = () => {
+      const isAuth = AuthService.isAnyUserLoggedIn();
+      
+      if (!isAuth) {
+        setLoading(false);
+        setError('Please log in to access the dashboard');
+        return;
+      }
+      
+      // If authenticated, fetch data
+      fetchRealTimeData();
+    };
+    
+    checkAuth();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

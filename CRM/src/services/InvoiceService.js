@@ -1,12 +1,12 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 
-const API_URL = 'http://localhost:8080/api/invoices';
+const API_URL = '/invoices';
 
 const InvoiceService = {
   // Get all invoices
   getAllInvoices: async () => {
     try {
-      const response = await axios.get(API_URL);
+      const response = await apiClient.get(API_URL);
       return response.data;
     } catch (error) {
       console.error('Error fetching all invoices:', error);
@@ -17,7 +17,7 @@ const InvoiceService = {
   // Get invoices by customer ID
   getInvoicesByCustomerId: async (customerId) => {
     try {
-      const response = await axios.get(`${API_URL}/customer/${customerId}`);
+      const response = await apiClient.get(`${API_URL}/customer/${customerId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching invoices for customer ID ${customerId}:`, error);
@@ -28,7 +28,7 @@ const InvoiceService = {
   // Get invoice by ID
   getInvoiceById: async (id) => {
     try {
-      const response = await axios.get(`${API_URL}/${id}`);
+      const response = await apiClient.get(`${API_URL}/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching invoice ID ${id}:`, error);
@@ -39,7 +39,7 @@ const InvoiceService = {
   // Create invoice for a customer
   createInvoice: async (invoice, customerId) => {
     try {
-      const response = await axios.post(`${API_URL}/customer/${customerId}`, invoice);
+      const response = await apiClient.post(`${API_URL}/customer/${customerId}`, invoice);
       return response.data;
     } catch (error) {
       console.error(`Error creating invoice for customer ID ${customerId}:`, error);
@@ -50,7 +50,7 @@ const InvoiceService = {
   // Update invoice
   updateInvoice: async (id, invoice) => {
     try {
-      const response = await axios.put(`${API_URL}/${id}`, invoice);
+      const response = await apiClient.put(`${API_URL}/${id}`, invoice);
       return response.data;
     } catch (error) {
       console.error(`Error updating invoice ID ${id}:`, error);
@@ -61,7 +61,7 @@ const InvoiceService = {
   // Delete invoice
   deleteInvoice: async (id) => {
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await apiClient.delete(`${API_URL}/${id}`);
     } catch (error) {
       console.error(`Error deleting invoice ID ${id}:`, error);
     }
@@ -70,7 +70,7 @@ const InvoiceService = {
   // Generate a new invoice number
   generateInvoiceNumber: async () => {
     try {
-      const response = await axios.get(`${API_URL}/generate-invoice-number`);
+      const response = await apiClient.get(`${API_URL}/generate-invoice-number`);
       return response.data;
     } catch (error) {
       console.error('Error generating invoice number:', error);
@@ -81,7 +81,7 @@ const InvoiceService = {
   // Get invoices by customer email
   getInvoicesByEmail: async (email) => {
     try {
-      const response = await axios.get(`${API_URL}/customer/email/${encodeURIComponent(email)}`);
+      const response = await apiClient.get(`${API_URL}/customer/email/${encodeURIComponent(email)}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching invoices for email ${email}:`, error);
@@ -92,7 +92,7 @@ const InvoiceService = {
   // Generate invoice from a quotation
   generateInvoiceFromQuotation: async (quotationId) => {
     try {
-      const response = await axios.post(`${API_URL}/from-quotation/${quotationId}`);
+      const response = await apiClient.post(`${API_URL}/from-quotation/${quotationId}`);
       return response.data;
     } catch (error) {
       console.error(`Error generating invoice from quotation ID ${quotationId}:`, error);
@@ -103,7 +103,7 @@ const InvoiceService = {
   // Send invoice to customer via email
   sendInvoiceToCustomer: async (invoiceId) => {
     try {
-      const response = await axios.post(`${API_URL}/${invoiceId}/send`);
+      const response = await apiClient.post(`${API_URL}/${invoiceId}/send`);
       return response.data;
     } catch (error) {
       console.error(`Error sending invoice ID ${invoiceId}:`, error);

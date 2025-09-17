@@ -103,11 +103,16 @@ const ChatBotTicketModal = ({
         priority: formData.priority,
         status: 'NEW', // Ensure tickets created by chatbot always have NEW status
         customerId: currentUser?.userId || currentUser?.id || 1,
+        customerName: currentUser?.name || 'Chatbot User',
+        customerEmail: currentUser?.email || 'chatbot@demo.com',
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         category: formData.category,
         source: 'CHATBOT' // Mark as chatbot-created for tracking
       };
 
+      console.log('Creating ticket with data:', ticketData);
+      
       // Use TicketService to create the ticket properly
       const result = await TicketService.createTicket(ticketData, ticketData.customerId);
       console.log('Chatbot ticket created successfully:', result);

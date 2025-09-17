@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Pagination from "../common/Pagination";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import LeadService from "../../services/LeadService";
 
 const LeadsTab = ({ onError }) => {
   const [leads, setLeads] = useState([]);
@@ -36,13 +37,10 @@ const LeadsTab = ({ onError }) => {
     }
   }, [searchQuery, leads]);
 
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
     setLoadingLeads(true);
     try {
-      const response = await fetch("http://localhost:8080/api/leads");
-      if (!response.ok) throw new Error("Failed to fetch leads");
-
-      const data = await response.json();
+      const data = await LeadService.getAllLeads();
       setLeads(data);
       onError("");
     } catch (err) {
@@ -51,7 +49,7 @@ const LeadsTab = ({ onError }) => {
     } finally {
       setLoadingLeads(false);
     }
-  };
+  }, [onError]);
 
   const exportToExcel = () => {
     setExportLoading(true);

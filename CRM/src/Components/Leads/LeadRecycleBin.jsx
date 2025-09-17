@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-
-const API_URL = "http://localhost:8080/api/leads";
+import LeadService from "../../services/LeadService";
 
 const RecycleBin = () => {
   const [deletedLeads, setDeletedLeads] = useState([]);
@@ -14,11 +13,7 @@ const RecycleBin = () => {
   const fetchDeletedLeads = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/recycle-bin`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch deleted leads: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await LeadService.getRecycleBinLeads();
       setDeletedLeads(data);
     } catch (err) {
       setError("Error fetching deleted leads. Please try again.");
@@ -48,17 +43,13 @@ const RecycleBin = () => {
     setMessage(null);
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/restore/${selectedLead.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!response.ok) throw new Error(`Failed to restore lead: ${response.status}`);
+      await LeadService.restoreLead(selectedLead.id);
       setMessage("Lead restored successfully!");
       setShowRestoreConfirm(false);
       setSelectedLead(null);
       await fetchDeletedLeads();
-    } catch {
-      setError("Error restoring lead. Please try again.");
+    } catch (error) {
+      setError(`Error restoring lead: ${error.message || "Please try again."}`);
     }
   };
 
@@ -68,16 +59,13 @@ const RecycleBin = () => {
     setMessage(null);
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/delete-permanent/${selectedLead.id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error(`Failed to permanently delete lead: ${response.status}`);
+      await LeadService.permanentDeleteLead(selectedLead.id);
       setMessage("Lead permanently deleted successfully!");
       setShowPermanentDeleteConfirm(false);
       setSelectedLead(null);
       await fetchDeletedLeads();
-    } catch {
-      setError("Error permanently deleting lead. Please try again.");
+    } catch (error) {
+      setError(`Error permanently deleting lead: ${error.message || "Please try again."}`);
     }
   };
 

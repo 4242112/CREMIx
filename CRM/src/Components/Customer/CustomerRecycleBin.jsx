@@ -14,7 +14,12 @@ const CustomerRecycleBin = () => {
     setLoading(true);
     try {
       const data = await CustomerService.getDeletedCustomers();
-      setDeletedCustomers(data);
+      // Filter to only show customers that are actually deleted (status = 'DELETED')
+      // If status field doesn't exist, show all (fallback for backwards compatibility)
+      const actuallyDeletedCustomers = data.filter(customer => 
+        !customer.status || customer.status === 'DELETED'
+      );
+      setDeletedCustomers(actuallyDeletedCustomers);
     } catch (err) {
       setError("Error fetching deleted Customers. Please try again.");
       console.error(err);

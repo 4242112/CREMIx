@@ -7,9 +7,9 @@ import DeleteLead from "./Buttons/Delete";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Pagination from "../common/Pagination";
-
-const API_URL = "http://localhost:8080/api/leads";
-const OPPORTUNITY_URL = "http://localhost:8080/api/opportunities";
+import AuthService from "../../services/AuthService";
+import LeadService from "../../services/LeadService";
+import OpportunityService from "../../services/OpportunityService";
 
 const ManageLeads = () => {
   const navigate = useNavigate();
@@ -27,6 +27,19 @@ const ManageLeads = () => {
   const [filteredLeads, setFilteredLeads] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [leadsPerPage] = useState(10);
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const checkAuth = () => {
+      if (!AuthService.isAnyUserLoggedIn()) {
+        navigate('/login');
+        return;
+      }
+      fetchLeads();
+    };
+    
+    checkAuth();
+  }, [navigate]);
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -109,9 +122,7 @@ const ManageLeads = () => {
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      const res = await fetch(API_URL);
-      if (!res.ok) throw new Error(`Failed to fetch leads: ${res.status}`);
-      const data = await res.json();
+      const data = await LeadService.getAllLeads();
       if (!Array.isArray(data)) throw new Error("Unexpected data format");
       data.reverse();
       setLeads(data);
@@ -175,17 +186,7 @@ const ManageLeads = () => {
 
       console.log('Sending lead data:', leadData); // Debug log
 
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(leadData),
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Server response:', response.status, errorText);
-        throw new Error(`Failed to save lead: ${response.status} - ${errorText}`);
-      }
+      await LeadService.createLead(leadData);
       
       setMessage("Lead saved successfully!");
       setShowLeadForm(false);
@@ -221,32 +222,19 @@ const ManageLeads = () => {
         expectedRevenue: selectedLead.expectedRevenue || 0,
         conversionProbability: selectedLead.conversionProbability || 50,
       };
-      const response = await fetch(
-        `${OPPORTUNITY_URL}/from-lead/${selectedLead.id}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(conversionData),
-        }
-      );
-      if (!response.ok) throw new Error("Failed to convert lead");
+      await OpportunityService.convertLeadToOpportunity(selectedLead.id, conversionData);
       setMessage("Lead converted to opportunity successfully!");
       setShowConvertConfirm(false);
       setSelectedLead(null);
       await fetchLeads();
-    } catch (err) {
+    } catch {
       setError("Error converting lead. Please try again.");
     }
   };
 
   const handleUpdateLead = async (data) => {
     try {
-      const response = await fetch(`${API_URL}/${data.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error("Failed to update lead");
+      await LeadService.updateLead(data.id, data);
       setMessage("Lead updated successfully!");
       setShowEditForm(false);
       setSelectedLead(null);
@@ -259,10 +247,7 @@ const ManageLeads = () => {
   const handleConfirmDelete = async () => {
     if (!selectedLead) return;
     try {
-      const response = await fetch(`${API_URL}/${selectedLead.id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Failed to delete lead");
+      await LeadService.deleteLead(selectedLead.id);
       setMessage("Lead deleted successfully!");
       setShowDeleteForm(false);
       setSelectedLead(null);

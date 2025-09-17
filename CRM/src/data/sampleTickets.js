@@ -143,7 +143,18 @@ export const initializeSampleTickets = () => {
 // Get tickets from localStorage (demo mode)
 export const getDemoTickets = () => {
   const tickets = localStorage.getItem('demoTickets');
-  return tickets ? JSON.parse(tickets) : sampleTickets;
+  if (tickets) {
+    try {
+      const parsedTickets = JSON.parse(tickets);
+      console.log('📋 Retrieved tickets from localStorage:', parsedTickets.length, 'tickets');
+      return parsedTickets;
+    } catch (error) {
+      console.error('Error parsing tickets from localStorage:', error);
+      return sampleTickets;
+    }
+  }
+  console.log('📋 No localStorage tickets found, using sample tickets');
+  return sampleTickets;
 };
 
 export default sampleTickets;

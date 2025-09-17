@@ -92,6 +92,36 @@ const CustomerService = {
       console.error('Error fetching customer stats:', error);
       throw error;
     }
+  },
+
+  getDeletedCustomers: async () => {
+    try {
+      const response = await apiClient.get('/customers/recycle-bin');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching deleted customers:', error);
+      throw error;
+    }
+  },
+
+  restoreCustomer: async (id) => {
+    try {
+      const response = await apiClient.put(`/customers/restore/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error restoring customer with id ${id}:`, error);
+      throw error;
+    }
+  },
+
+  permanentlyDeleteCustomer: async (id) => {
+    try {
+      await apiClient.delete(`/customers/delete-permanent/${id}`);
+      return true;
+    } catch (error) {
+      console.error(`Error permanently deleting customer with id ${id}:`, error);
+      throw error;
+    }
   }
 };
 

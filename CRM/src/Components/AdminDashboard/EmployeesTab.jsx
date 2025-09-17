@@ -81,10 +81,41 @@ const EmployeesTab = ({ onError, onSuccess }) => {
 
   const handleCreateEmployee = async () => {
     const errors = {};
-    if (!newEmployee.name) errors.name = "Name is required";
-    if (!newEmployee.email) errors.email = "Email is required";
-    if (!newEmployee.phone) errors.phone = "Phone number is required";
-    if (!newEmployee.password) errors.password = "Password is required";
+    
+    // Name validation
+    if (!newEmployee.name) {
+      errors.name = "Name is required";
+    } else if (newEmployee.name.trim().length < 2) {
+      errors.name = "Name must be at least 2 characters long";
+    }
+    
+    // Email validation
+    if (!newEmployee.email) {
+      errors.email = "Email is required";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(newEmployee.email)) {
+        errors.email = "Please enter a valid email address";
+      }
+    }
+    
+    // Phone validation (matches backend pattern: ^(\+?\d{2})?[0-9]{10}$)
+    if (!newEmployee.phone) {
+      errors.phone = "Phone number is required";
+    } else {
+      const phoneRegex = /^(\+?\d{2})?[0-9]{10}$/;
+      if (!phoneRegex.test(newEmployee.phone)) {
+        errors.phone = "Phone number must be 10 digits, optionally with 2-digit country code";
+      }
+    }
+    
+    // Password validation
+    if (!newEmployee.password) {
+      errors.password = "Password is required";
+    } else if (newEmployee.password.length < 6) {
+      errors.password = "Password must be at least 6 characters long";
+    }
+    
     if (newEmployee.password !== newEmployee.confirmPassword) {
       errors.confirmPassword = "Passwords do not match";
     }
@@ -108,7 +139,18 @@ const EmployeesTab = ({ onError, onSuccess }) => {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to create employee");
+      if (!response.ok) {
+        // Get detailed error message from response
+        let errorMessage = "Failed to create employee";
+        try {
+          const errorData = await response.text();
+          console.error("API Error Response:", errorData);
+          errorMessage = `Failed to create employee (${response.status}): ${errorData}`;
+        } catch {
+          errorMessage = `Failed to create employee (${response.status})`;
+        }
+        throw new Error(errorMessage);
+      }
 
       const newEmployeeData = await response.json();
       setEmployees([...employees, newEmployeeData]);
@@ -129,12 +171,13 @@ const EmployeesTab = ({ onError, onSuccess }) => {
       setFormErrors({});
     } catch (err) {
       console.error("Error creating employee:", err);
+      const errorMessage = err.message || 'Failed to create employee. Please try again.';
       setToast({
         open: true,
-        message: 'Failed to create employee. Please try again.',
+        message: errorMessage,
         type: 'error'
       });
-      if (onError) onError("Failed to create employee. Please try again.");
+      if (onError) onError(errorMessage);
     }
   };
 

@@ -1,6 +1,6 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 
-const API_URL = 'http://localhost:8080/api/categories';
+const API_URL = '/categories';
 
 /**
  * @typedef {Object} Category
@@ -14,7 +14,7 @@ const API_URL = 'http://localhost:8080/api/categories';
 const CategoryService = {
     /** Get all categories */
     getAllCategories: async () => {
-        const response = await axios.get(API_URL);
+        const response = await apiClient.get(API_URL);
         return response.data;
     },
 
@@ -22,7 +22,7 @@ const CategoryService = {
      * @param {number} id 
      */
     getCategoryById: async (id) => {
-        const response = await axios.get(`${API_URL}/${id}`);
+        const response = await apiClient.get(`${API_URL}/${id}`);
         return response.data;
     },
 
@@ -30,7 +30,7 @@ const CategoryService = {
      * @param {Category} category 
      */
     createCategory: async (category) => {
-        const response = await axios.post(API_URL, category);
+        const response = await apiClient.post(API_URL, category);
         return response.data;
     },
 
@@ -39,7 +39,7 @@ const CategoryService = {
      * @param {Category} category 
      */
     updateCategory: async (id, category) => {
-        const response = await axios.put(`${API_URL}/${id}`, category);
+        const response = await apiClient.put(`${API_URL}/${id}`, category);
         return response.data;
     },
 
@@ -47,14 +47,14 @@ const CategoryService = {
      * @param {number} id 
      */
     deleteCategory: async (id) => {
-        await axios.delete(`${API_URL}/${id}`);
+        await apiClient.delete(`${API_URL}/${id}`);
     },
 
     /** Search categories by name
      * @param {string} name 
      */
     searchCategories: async (name) => {
-        const response = await axios.get(`${API_URL}/search?name=${encodeURIComponent(name)}`);
+        const response = await apiClient.get(`${API_URL}/search?name=${encodeURIComponent(name)}`);
         return response.data;
     }
 };

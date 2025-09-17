@@ -40,11 +40,11 @@ const InvoiceView = ({ show, onHide, invoice, customer }) => {
 
             {/* Business Details */}
             <div className="mb-4">
-              <div className="font-bold text-lg">ClientNest Solutions</div>
+              <div className="font-bold text-lg">CREMIx</div>
               <div>7th Floor Nayti Park</div>
               <div>Pune, Maharashtra 414002</div>
               <div>Phone: (800) 555-8800</div>
-              <div>Email: Admin@clientnest.com</div>
+              <div>Email: cremix@gmail.com</div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4 mt-4">
@@ -137,7 +137,7 @@ const InvoiceView = ({ show, onHide, invoice, customer }) => {
             <p>
               Bank: National Bank
               <br />
-              Account Name: ClientNest Solutions
+              Account Name: CREMIx
               <br />
               Account Number: 1234567890
             </p>

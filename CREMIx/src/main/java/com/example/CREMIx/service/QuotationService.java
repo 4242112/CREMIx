@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.CREMIx.dto.InvoiceDTO;
 import com.example.CREMIx.dto.QuotationDTO;
 import com.example.CREMIx.model.Customer;
+import com.example.CREMIx.model.Product;
 import com.example.CREMIx.model.QItem;
 import com.example.CREMIx.model.Quotation;
 import com.example.CREMIx.repository.CustomerRepository;
@@ -55,10 +56,27 @@ public class QuotationService {
         List<QItem> itemsList = new ArrayList<>();
         for (var item : quotationDTO.getItems()) {
             QItem qItem = new QItem();
-            var product = productRepository.findByNameContainingIgnoreCase(
-                item.getProduct().getName()
-            );
-            qItem.setProduct((product));
+            
+            // Find product by ID if available, otherwise by name
+            Product product = null;
+            if (item.getProduct().getId() != null) {
+                Optional<Product> productOpt = productRepository.findById(item.getProduct().getId());
+                if (productOpt.isPresent()) {
+                    product = productOpt.get();
+                }
+            } else {
+                product = productRepository.findByNameContainingIgnoreCase(
+                    item.getProduct().getName()
+                );
+            }
+            
+            if (product == null) {
+                throw new RuntimeException("Product not found: " + 
+                    (item.getProduct().getId() != null ? "ID " + item.getProduct().getId() : 
+                     "Name " + item.getProduct().getName()));
+            }
+            
+            qItem.setProduct(product);
             qItem.setQuantity(item.getQuantity());
             // Set the discount value from DTO to entity
             qItem.setDiscount(item.getDiscount() != null ? item.getDiscount() : 0.0);
@@ -111,10 +129,27 @@ public class QuotationService {
         List<QItem> itemsList = new ArrayList<>();
         for (var item : quotationDTO.getItems()) {
             QItem qItem = new QItem();
-            var product = productRepository.findByNameContainingIgnoreCase(
-                item.getProduct().getName()
-            );
-            qItem.setProduct((product));
+            
+            // Find product by ID if available, otherwise by name
+            Product product = null;
+            if (item.getProduct().getId() != null) {
+                Optional<Product> productOpt = productRepository.findById(item.getProduct().getId());
+                if (productOpt.isPresent()) {
+                    product = productOpt.get();
+                }
+            } else {
+                product = productRepository.findByNameContainingIgnoreCase(
+                    item.getProduct().getName()
+                );
+            }
+            
+            if (product == null) {
+                throw new RuntimeException("Product not found: " + 
+                    (item.getProduct().getId() != null ? "ID " + item.getProduct().getId() : 
+                     "Name " + item.getProduct().getName()));
+            }
+            
+            qItem.setProduct(product);
             qItem.setQuantity(item.getQuantity());
             qItem.setDiscount(item.getDiscount() != null ? item.getDiscount() : 0.0);
             qItem.setQuotation(quotation);
@@ -149,10 +184,27 @@ public class QuotationService {
             List<QItem> updatedItems = new ArrayList<>();
             for (var item : quotationDTO.getItems()) {
                 QItem qItem = new QItem();
-                var product = productRepository.findByNameContainingIgnoreCase(
-                    item.getProduct().getName()
-                );
-                qItem.setProduct((product));
+                
+                // Find product by ID if available, otherwise by name
+                Product product = null;
+                if (item.getProduct().getId() != null) {
+                    Optional<Product> productOpt = productRepository.findById(item.getProduct().getId());
+                    if (productOpt.isPresent()) {
+                        product = productOpt.get();
+                    }
+                } else {
+                    product = productRepository.findByNameContainingIgnoreCase(
+                        item.getProduct().getName()
+                    );
+                }
+                
+                if (product == null) {
+                    throw new RuntimeException("Product not found: " + 
+                        (item.getProduct().getId() != null ? "ID " + item.getProduct().getId() : 
+                         "Name " + item.getProduct().getName()));
+                }
+                
+                qItem.setProduct(product);
                 qItem.setQuantity(item.getQuantity());
                 // Set the discount value from DTO to entity
                 qItem.setDiscount(item.getDiscount() != null ? item.getDiscount() : 0.0);

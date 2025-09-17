@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from "./apiClient";
 
 // DateTime = [year, month, day, hour, minute]
 
@@ -79,14 +79,14 @@ export const dateStringToDateTime = (dateString) => {
   return dateToDateTime(date);
 };
 
-const BASE_URL = "http://localhost:8080/api/call-logs";
+const BASE_URL = "/call-logs";
 
 const CallLogService = {
   // Get all call logs
   getAllCallLogs: async () => {
     try {
       console.log("Fetching all call logs");
-      const response = await axios.get(BASE_URL);
+      const response = await apiClient.get(BASE_URL);
       console.log("Call logs response:", response.data);
       return response.data;
     } catch (error) {
@@ -104,7 +104,7 @@ const CallLogService = {
 
     try {
       console.log(`Fetching call logs for customer ID: ${customerId}`);
-      const response = await axios.get(`${BASE_URL}/customer/${customerId}`);
+      const response = await apiClient.get(`${BASE_URL}/customer/${customerId}`);
       console.log("Customer call logs response:", response.data);
       return response.data;
     } catch (error) {
@@ -125,7 +125,7 @@ const CallLogService = {
 
     try {
       console.log(`Fetching call logs for customer email: ${email}`);
-      const response = await axios.get(
+      const response = await apiClient.get(
         `${BASE_URL}/customer/email/${encodeURIComponent(email)}`
       );
       console.log("Customer call logs by email response:", response.data);
@@ -148,7 +148,7 @@ const CallLogService = {
 
     try {
       console.log("Fetching all call logs to filter by customer name");
-      const response = await axios.get(BASE_URL);
+      const response = await apiClient.get(BASE_URL);
       const allLogs = response.data;
 
       const filteredLogs = allLogs.filter(
@@ -183,7 +183,7 @@ const CallLogService = {
         };
       }
 
-      const response = await axios.post(BASE_URL, callLog);
+      const response = await apiClient.post(BASE_URL, callLog);
       console.log("Created call log response:", response.data);
       return response.data;
     } catch (error) {
@@ -205,7 +205,7 @@ const CallLogService = {
         };
       }
 
-      const response = await axios.put(`${BASE_URL}/${id}`, callLog);
+      const response = await apiClient.put(`${BASE_URL}/${id}`, callLog);
       console.log("Updated call log response:", response.data);
       return response.data;
     } catch (error) {
@@ -218,7 +218,7 @@ const CallLogService = {
   deleteCallLog: async (id) => {
     try {
       console.log(`Deleting call log ID: ${id}`);
-      await axios.delete(`${BASE_URL}/${id}`);
+      await apiClient.delete(`${BASE_URL}/${id}`);
       console.log(`Call log ID ${id} deleted successfully`);
     } catch (error) {
       console.error(`Error deleting call log ID ${id}:`, error);

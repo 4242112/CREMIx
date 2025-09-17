@@ -1,45 +1,45 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 import InvoiceService from './InvoiceService';
 
-const API_URL = 'http://localhost:8080/api/products';
+const API_URL = '/products';
 
 const ProductService = {
     getAllProducts: async () => {
-        const response = await axios.get(API_URL);
+        const response = await apiClient.get(API_URL);
         return response.data;
     },
 
     getProductById: async (id) => {
-        const response = await axios.get(`${API_URL}/${id}`);
+        const response = await apiClient.get(`${API_URL}/${id}`);
         return response.data;
     },
 
     createProduct: async (product) => {
-        const response = await axios.post(API_URL, product);
+        const response = await apiClient.post(API_URL, product);
         return response.data;
     },
 
     updateProduct: async (id, product) => {
-        const response = await axios.put(`${API_URL}/${id}`, product);
+        const response = await apiClient.put(`${API_URL}/${id}`, product);
         return response.data;
     },
 
     deleteProduct: async (id) => {
-        await axios.delete(`${API_URL}/${id}`);
+        await apiClient.delete(`${API_URL}/${id}`);
     },
 
     searchProductsByName: async (name) => {
-        const response = await axios.get(`${API_URL}/search?name=${name}`);
+        const response = await apiClient.get(`${API_URL}/search?name=${name}`);
         return response.data;
     },
 
     getProductsByCategory: async (category) => {
-        const response = await axios.get(`${API_URL}/category/${category}`);
+        const response = await apiClient.get(`${API_URL}/category/${category}`);
         return response.data;
     },
 
     getProductsByStatus: async (status) => {
-        const response = await axios.get(`${API_URL}/status/${status}`);
+        const response = await apiClient.get(`${API_URL}/status/${status}`);
         return response.data;
     },
 

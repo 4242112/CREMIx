@@ -1,82 +1,62 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 import ProductService from './ProductService';
 
-const BASE_URL = 'http://localhost:8080/api/quotations';
+const BASE_URL = '/quotations';
 
 const QuotationService = {
   getQuotation: async (id) => {
-    const response = await axios.get(`${BASE_URL}/opportunity/${id}`);
+    const response = await apiClient.get(`${BASE_URL}/opportunity/${id}`);
     console.log('QuotationService response:', response.data);
     return response.data;
   },
 
   saveQuotation: async (opportunityId, quotation) => {
-    const response = await axios.post(`${BASE_URL}/opportunity/${opportunityId}`, quotation);
+    const response = await apiClient.post(`${BASE_URL}/opportunity/${opportunityId}`, quotation);
     return response.data;
   },
 
   // Create a quotation directly for a customer (multiple quotations support)
   createQuotationForCustomer: async (customerId, quotation) => {
-    const response = await axios.post(`${BASE_URL}/customer/${customerId}`, quotation);
+    const response = await apiClient.post(`${BASE_URL}/customer/${customerId}`, quotation);
     return response.data;
   },
 
   updateQuotation: async (id, quotation) => {
-    const response = await axios.put(`${BASE_URL}/${id}`, quotation);
+    const response = await apiClient.put(`${BASE_URL}/${id}`, quotation);
     return response.data;
   },
 
   deleteQuotation: async (id) => {
-    await axios.delete(`${BASE_URL}/${id}`);
+    await apiClient.delete(`${BASE_URL}/${id}`);
   },
 
   sendQuotation: async (id) => {
-    const response = await axios.post(`${BASE_URL}/${id}/send`);
+    const response = await apiClient.post(`${BASE_URL}/${id}/send`);
     return response.data;
   },
 
   getCustomerQuotations: async (customerId) => {
-    const response = await axios.get(`${BASE_URL}/customer/${customerId}`);
+    const response = await apiClient.get(`${BASE_URL}/customer/${customerId}`);
     return response.data;
   },
 
   getQuotationsByEmail: async (email) => {
-    const response = await axios.get(`${BASE_URL}/customer/email/${email}`);
+    const response = await apiClient.get(`${BASE_URL}/customer/email/${email}`);
     return response.data;
   },
 
   getQuotationsByName: async (name) => {
-    const response = await axios.get(`${BASE_URL}/customer/name/${name}`);
+    const response = await apiClient.get(`${BASE_URL}/customer/name/${name}`);
     return response.data;
   },
 
   acceptQuotation: async (id) => {
-    const response = await axios.post(`${BASE_URL}/${id}/accept`);
+    const response = await apiClient.post(`${BASE_URL}/${id}/accept`);
     return response.data;
   },
 
   rejectQuotation: async (id) => {
-    const response = await axios.post(`${BASE_URL}/${id}/reject`);
-    return response.data;
-  },
-
-  // Create a quotation request for a product
-  createProductQuotationRequest: async (productId, customerId, customerEmail, quantity = 1) => {
-    const quotationData = {
-      title: `Product Quote Request`,
-      description: `Customer quote request for product ID: ${productId}`,
-      customerEmail: customerEmail,
-      customerId: customerId,
-      items: [{
-        productId: productId,
-        quantity: quantity,
-        unitPrice: 0 // Will be filled by admin
-      }],
-      stage: 'DRAFT',
-      total: 0
-    };
-    
-    const response = await axios.post(`${BASE_URL}/product-request`, quotationData);
+    const response = await apiClient.post(`${BASE_URL}/${id}/reject`);
     return response.data;
   }
 };

@@ -1,5 +1,6 @@
 package com.example.CREMIx.dto;
 
+import com.example.CREMIx.misc.ActivityStatus;
 import com.example.CREMIx.model.Customer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class CustomerDTO {
     private String website;
     private Customer.CustomerType type;
     private Boolean hasPassword;
+    private ActivityStatus status;
     
     public static CustomerDTO fromEntity(Customer customer) {
         CustomerDTO dto = new CustomerDTO();
@@ -36,6 +38,7 @@ public class CustomerDTO {
         dto.setWebsite(customer.getWebsite());
         dto.setType(customer.getType());
         dto.setHasPassword(customer.getHasPassword());
+        dto.setStatus(customer.getStatus());
         return dto;
     }
 }

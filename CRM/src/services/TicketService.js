@@ -123,25 +123,47 @@ export const TicketService = {
       console.warn('Backend API not available, simulating ticket creation:', error.message);
       
       // FALLBACK: Create ticket in demo data system for development/demo
+      const currentTime = new Date().toISOString();
       const newTicket = {
-        id: Date.now(), // Generate unique ID based on timestamp
+        id: `TCK-${Date.now()}`, // Generate unique ID with prefix
         ...ticket,
         status: ticket.status || 'NEW', // Ensure NEW status is preserved
         customerId: customerId,
-        customerName: 'Demo Customer',  // In real app, fetch from customer service
+        customerName: ticket.customerName || 'Demo Customer',  // Use provided name or default
+        customerEmail: ticket.customerEmail || 'demo@example.com',
         employeeName: null,             // Will be assigned later by admin/system
         assignedTo: null,               // Employee assignment happens in workflow
-        createdAt: ticket.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        priority: ticket.priority || 'MEDIUM'  // Default priority for new tickets
+        createdAt: ticket.createdAt || currentTime, // Preserve provided date or use current
+        updatedAt: ticket.updatedAt || currentTime, // Ensure updatedAt is set
+        priority: ticket.priority || 'MEDIUM',  // Default priority for new tickets
+        category: ticket.category || 'General Support',
+        source: ticket.source || 'MANUAL'
       };
       
       // STORAGE: Add to localStorage-based demo ticket system
-      const existingTickets = JSON.parse(localStorage.getItem('demoTickets')) || getDemoTickets();
+      let existingTickets = [];
+      try {
+        const storedTickets = localStorage.getItem('demoTickets');
+        if (storedTickets) {
+          existingTickets = JSON.parse(storedTickets);
+        } else {
+          existingTickets = getDemoTickets();
+        }
+      } catch (error) {
+        console.error('Error reading existing tickets:', error);
+        existingTickets = getDemoTickets();
+      }
+      
       existingTickets.push(newTicket);
       localStorage.setItem('demoTickets', JSON.stringify(existingTickets));
       
-      console.log('Demo ticket created successfully:', newTicket);
+      console.log('Demo ticket created successfully with dates:', {
+        id: newTicket.id,
+        createdAt: newTicket.createdAt,
+        updatedAt: newTicket.updatedAt,
+        subject: newTicket.subject,
+        totalTickets: existingTickets.length
+      });
       return newTicket;
     }
   },
@@ -295,14 +317,29 @@ export const TicketService = {
  * Handles various date formats and provides fallback for invalid dates
  */
 export const formatDate = (dateString) => {
-  if (!dateString) return '';
+  if (!dateString) return 'N/A';
+  
+  // If it's already in MM/DD/YY format, return as is
   if (/^\d{2}\/\d{2}\/\d{2}$/.test(dateString)) return dateString;
+  
   try {
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Invalid date';
-    return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getFullYear() % 100).padStart(2, '0')}`;
-  } catch {
-    return 'Invalid date';
+    
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date string:', dateString);
+      return 'N/A';
+    }
+    
+    // Format as MM/DD/YY
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = String(date.getFullYear() % 100).padStart(2, '0');
+    
+    return `${month}/${day}/${year}`;
+  } catch (error) {
+    console.error('Error formatting date:', dateString, error);
+    return 'N/A';
   }
 };
 
