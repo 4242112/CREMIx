@@ -32,6 +32,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/auth/**").permitAll()  // Allow authentication endpoints
                 .requestMatchers("/api/health").permitAll()    // Allow health check
+                .requestMatchers("/api/**").permitAll()       // Temporarily allow all API endpoints
                 .anyRequest().authenticated()                  // Require authentication for all other requests
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Stateless sessions
