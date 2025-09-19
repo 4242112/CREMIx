@@ -11,26 +11,20 @@ const Tickets = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [showTicketModal, setShowTicketModal] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
-  const [viewMode, setViewMode] = useState("view");
 
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTicket, setNewTicket] = useState({
     subject: "",
     description: "",
     status: TicketStatus.NEW,
   });
 
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [ticketsPerPage] = useState(10);
 
-  const isEmployee = AuthService.isEmployeeLoggedIn();
   const currentEmployee = AuthService.getCurrentEmployee();
-  const isAdmin = currentEmployee?.role === "ADMIN";
 
   useEffect(() => {
     fetchTickets();
@@ -67,80 +61,12 @@ const Tickets = () => {
 
   const handleOpenTicket = (ticket) => {
     setSelectedTicket(ticket);
-    setViewMode("view");
-    setShowTicketModal(true);
-  };
-
-  const handleEditTicket = () => {
-    setViewMode("edit");
-  };
-
-  const handleUpdateTicket = async () => {
-    if (!selectedTicket || !selectedTicket.id) return;
-
-    try {
-      await TicketService.updateTicket(selectedTicket.id, selectedTicket);
-      setShowTicketModal(false);
-      fetchTickets();
-      setError(null);
-    } catch (err) {
-      setError("Failed to update ticket. Please try again.");
-      console.error("Error updating ticket:", err);
-    }
-  };
-
-  const handleCreateTicket = async () => {
-    const customerId = 1;
-    try {
-      await TicketService.createTicket(newTicket, customerId);
-      setShowCreateModal(false);
-      setNewTicket({
-        subject: "",
-        description: "",
-        status: TicketStatus.NEW,
-      });
-      fetchTickets();
-      setError(null);
-    } catch (err) {
-      setError("Failed to create ticket. Please try again.");
-      console.error("Error creating ticket:", err);
-    }
+    // View ticket details logic can be added here
   };
 
   const confirmDelete = (id) => {
     setTicketToDelete(id);
-    setShowDeleteConfirm(true);
-  };
-
-  const handleDeleteTicket = async () => {
-    if (ticketToDelete === null) return;
-
-    try {
-      await TicketService.deleteTicket(ticketToDelete);
-      setShowDeleteConfirm(false);
-      fetchTickets();
-      setError(null);
-    } catch (err) {
-      setError("Failed to delete ticket. Please try again.");
-      console.error("Error deleting ticket:", err);
-    }
-  };
-
-  const handleTicket = async () => {
-    if (!selectedTicket?.id || !currentEmployee?.userId) return;
-
-    try {
-      await TicketService.assignTicketToEmployee(
-        selectedTicket.id,
-        currentEmployee.userId
-      );
-      setShowTicketModal(false);
-      fetchTickets();
-      setError(null);
-    } catch (err) {
-      setError("Failed to handle ticket. Please try again.");
-      console.error("Error handling ticket:", err);
-    }
+    // Delete confirmation logic can be added here
   };
 
   // Pagination logic
@@ -161,7 +87,7 @@ const Tickets = () => {
             🔄 Refresh
           </button>
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => {/* Create ticket functionality can be added here */}}
             className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             ➕ New Ticket

@@ -68,7 +68,173 @@ function App() {
         {/* Protected Routes - inside MainLayout */}
         <Route path="/" element={
           <ProtectedRoute>
-            {/* ...existing code... */}
+            <MainLayout>
+              <EmployeeRedirect>
+                <Navigate to="/customer/dashboard" replace />
+              </EmployeeRedirect>
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        {/* Employee/Admin Routes */}
+        <Route path="/tickets" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Tickets />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/tickets/open" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <OpenTickets />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/tickets/my" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <MyTickets />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/tickets/in-progress" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <InProgressTickets />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/tickets/closed" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ClosedTickets />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/leads" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ModernLeadsPage />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/leads/manage" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ManageLeads />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/leads/recycle-bin" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <LeadsRecycleBin />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/leads/:id" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <LeadViewDetails />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/opportunities" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ManageOpportunity />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/opportunities/recycle-bin" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <OpportunityRecycleBin />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/opportunities/:id" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <OpportunityViewDetails />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/customers" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ModernCustomersPage />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/customers/manage" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ManageCustomers />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/customers/recycle-bin" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <CustomerRecycleBin />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/customers/:id" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <CustomersViewDetails />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/catalog/categories" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Category />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/catalog/products" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Products />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ModernDashboard />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        {/* Customer Routes */}
+        <Route path="/customer/dashboard" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <CustomerDashboard />
+            </MainLayout>
           </ProtectedRoute>
         } />
       </Routes>
