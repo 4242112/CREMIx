@@ -361,18 +361,6 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
                 <ul className="ml-3 mt-1 space-y-1">
                   <li>
                     <Link
-                      to="/tickets/closed"
-                      className={`block rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
-                        isActive("/tickets/closed")
-                          ? "bg-blue-600 text-white shadow-lg"
-                          : "text-gray-600 hover:bg-blue-50 hover:text-blue-600 hover:shadow-md"
-                      }`}
-                    >
-                      🎟️ <span className="ml-2">Closed Tickets</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
                       to="/tickets/open"
                       className={`block rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
                         isActive("/tickets/open")
@@ -393,6 +381,18 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
                       }`}
                     >
                       🎟️ <span className="ml-2">In Progress Tickets</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/tickets/closed"
+                      className={`block rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+                        isActive("/tickets/closed")
+                          ? "bg-blue-600 text-white shadow-lg"
+                          : "text-gray-600 hover:bg-blue-50 hover:text-blue-600 hover:shadow-md"
+                      }`}
+                    >
+                      🎟️ <span className="ml-2">Closed Tickets</span>
                     </Link>
                   </li>
                 </ul>

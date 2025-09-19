@@ -6,8 +6,7 @@ import ProfileButton from './LeadNavigation/LeadNavButtons/Profile/ProfileButton
 import CallsButton from './LeadNavigation/LeadNavButtons/CallLog/CallsLog';
 import NotesButton from './LeadNavigation/LeadNavButtons/Notes/Notes';
 import EditLeads from './Buttons/Edit';
-
-const API_URL = "http://localhost:8080/api/leads";
+import LeadService from '../../services/LeadService';
 
 const LeadViewDetails = ({ lead: propLead, EditComponent = EditLeads }) => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -23,11 +22,7 @@ const LeadViewDetails = ({ lead: propLead, EditComponent = EditLeads }) => {
   useEffect(() => {
     if (id && !propLead) {
       setLoading(true);
-      fetch(`${API_URL}/${id}`)
-        .then(response => {
-          if (!response.ok) throw new Error('Failed to fetch lead data');
-          return response.json();
-        })
+      LeadService.getLeadById(id)
         .then(data => {
           setLead(data);
           setLoading(false);
@@ -53,15 +48,10 @@ const LeadViewDetails = ({ lead: propLead, EditComponent = EditLeads }) => {
     setMessage(null);
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/${data.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error(`Failed to update lead: ${response.status}`);
+      const updatedLead = await LeadService.updateLead(data.id, data);
       setMessage("Lead updated successfully!");
       setShowEditForm(false);
-      setLead(data);
+      setLead(updatedLead);
     } catch (err) {
       console.error("Update error:", err);
       setError("Error updating lead. Please try again.");

@@ -72,7 +72,7 @@ public class LeadService {
 
     public LeadDTO getLeadDetailsById(Long id) {
         return leadRepository.getLeadDetailsById(id);
-    }
+    } 
 
     public List<Lead> findByEmployeeId(Long employeeId) {
         return leadRepository.findByEmployeeId(employeeId);
@@ -87,7 +87,7 @@ public class LeadService {
             lead.setRequirement(leadDetails.getRequirement());
             lead.setSource(Lead.Source.valueOf(leadDetails.getSource().toUpperCase()));
             lead.setProbability(leadDetails.getConversionProbability());
-            lead.setExpectedRevenue(leadDetails.getExpectedRevenue());
+            lead.setExpectedRevenue(leadDetails.getExpectedRevenue()); 
 
             var employeeOption = employeeRepository.findByName(leadDetails.getAssignedTo().trim());
             if (employeeOption.isPresent()) {
