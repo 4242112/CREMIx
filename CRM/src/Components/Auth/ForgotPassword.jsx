@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import AuthService from "../../services/AuthService";
 
 const ForgotPassword = ({ onBack }) => {
   const [email, setEmail] = useState("");
@@ -15,19 +15,13 @@ const ForgotPassword = ({ onBack }) => {
     setMessage("");
 
     try {
-      await axios.post("http://localhost:8080/api/auth/forgot-password", {
-        email: email.trim()
-      });
+      await AuthService.forgotPassword(email);
       
       setMessage("Password reset link has been sent to your email address.");
       setStep("success");
     } catch (error) {
       console.error("Forgot password error:", error);
-      if (error.response?.data?.message) {
-        setError(error.response.data.message);
-      } else {
-        setError("Failed to send password reset email. Please try again.");
-      }
+      setError(error.message || "Failed to send password reset email. Please try again.");
     } finally {
       setIsLoading(false);
     }

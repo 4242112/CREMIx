@@ -3,6 +3,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../../services/AuthService";
 import TicketService from "../../services/TicketService";
+import EmployeeService from "../../services/EmployeeService";
+import LeadService from "../../services/LeadService";
+import CustomerService from "../../services/CustomerService";
 
 // Import existing tab components
 import LeadsTab from "./LeadsTab";
@@ -41,26 +44,14 @@ const ModernAdminDashboard = () => {
       
       try {
         setStatsLoading(true);
-        const token = localStorage.getItem("token");
         
-        // Fetch all stats in parallel
-        const [employeesRes, leadsRes, customersRes, ticketsData] = await Promise.all([
-          fetch("http://localhost:8080/api/employees", {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          fetch("http://localhost:8080/api/leads", {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          fetch("http://localhost:8080/api/customers", {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          TicketService.getAllTickets() // Use the proper service with authentication
+        // Fetch all stats in parallel using proper services
+        const [employees, leads, customers, tickets] = await Promise.all([
+          EmployeeService.getAllEmployees(),
+          LeadService.getAllLeads(),
+          CustomerService.getAllCustomers(),
+          TicketService.getAllTickets()
         ]);
-
-        const employees = employeesRes.ok ? await employeesRes.json() : [];
-        const leads = leadsRes.ok ? await leadsRes.json() : [];
-        const customers = customersRes.ok ? await customersRes.json() : [];
-        const tickets = Array.isArray(ticketsData) ? ticketsData : [];
 
         setDashboardStats({
           totalEmployees: Array.isArray(employees) ? employees.length : 0,

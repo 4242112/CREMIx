@@ -78,7 +78,7 @@ public class TicketDTO {
     }
 
     public void setTitle(String string) {
-        // TODO Auto-generated method stub
+    // ...existing code...
         throw new UnsupportedOperationException("Unimplemented method 'setTitle'");
     }
 }

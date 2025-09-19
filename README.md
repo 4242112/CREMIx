@@ -43,4 +43,5 @@ A comprehensive CRM application that allows organizations to manage interactions
 
 ## Contact
 
-Email: 4242112@mitacsc.edu.in
+Email: atharv.botre@jadegloabal.com
+

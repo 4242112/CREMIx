@@ -21,7 +21,8 @@
  * - Admin Panel: Full ticket management and analytics
  */
 
-import apiClient from './apiClient.js';
+import apiClient from './apiClient';
+import { formatDateToMMDDYY } from '../utils/dateUtils';
 import { getDemoTickets, initializeSampleTickets } from '../data/sampleTickets.js';
 
 /**
@@ -317,30 +318,7 @@ export const TicketService = {
  * Handles various date formats and provides fallback for invalid dates
  */
 export const formatDate = (dateString) => {
-  if (!dateString) return 'N/A';
-  
-  // If it's already in MM/DD/YY format, return as is
-  if (/^\d{2}\/\d{2}\/\d{2}$/.test(dateString)) return dateString;
-  
-  try {
-    const date = new Date(dateString);
-    
-    // Check if the date is valid
-    if (isNaN(date.getTime())) {
-      console.warn('Invalid date string:', dateString);
-      return 'N/A';
-    }
-    
-    // Format as MM/DD/YY
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const year = String(date.getFullYear() % 100).padStart(2, '0');
-    
-    return `${month}/${day}/${year}`;
-  } catch (error) {
-    console.error('Error formatting date:', dateString, error);
-    return 'N/A';
-  }
+  return formatDateToMMDDYY(dateString);
 };
 
 // Export types for use in components

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import AuthService from "../../services/AuthService";
 
 const validatePassword = (password) => {
   if (password.length < 8) {
@@ -50,10 +50,8 @@ const ResetPassword = () => {
 
     const validateToken = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/password-reset/validate?token=${tokenFromUrl}`
-        );
-        setIsValidToken(response.data);
+        const isValid = await AuthService.validateResetToken(tokenFromUrl);
+        setIsValidToken(isValid);
       } catch (error) {
         setIsValidToken(false);
       } finally {
@@ -113,6 +111,8 @@ const ResetPassword = () => {
     setLoading(true);
 
     try {
+      await AuthService.resetPassword(token, password);
+      
       setMessage({
         type: "success",
         text: "Your password has been reset successfully! Redirecting to login...",
@@ -124,7 +124,7 @@ const ResetPassword = () => {
     } catch (error) {
       setMessage({
         type: "error",
-        text: "Failed to reset password. The link may have expired. Please request a new reset link.",
+        text: error.message || "Failed to reset password. The link may have expired. Please request a new reset link.",
       });
     } finally {
       setLoading(false);

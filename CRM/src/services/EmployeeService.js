@@ -93,6 +93,73 @@ const EmployeeService = {
       console.error('Error fetching employee sales performance:', error);
       return [];
     }
+  },
+
+  /**
+   * Create a new employee
+   * @param {Object} employeeData - Employee data to create
+   * @returns {Promise<Object>}
+   */
+  createEmployee: async (employeeData) => {
+    try {
+      const response = await apiClient.post(API_URL, employeeData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating employee:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update an employee
+   * @param {number} id - Employee ID
+   * @param {Object} employeeData - Updated employee data
+   * @returns {Promise<Object>}
+   */
+  updateEmployee: async (id, employeeData) => {
+    try {
+      const response = await apiClient.put(`${API_URL}/${id}`, employeeData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating employee:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete an employee
+   * @param {number} id - Employee ID
+   * @returns {Promise<void>}
+   */
+  deleteEmployee: async (id) => {
+    try {
+      await apiClient.delete(`${API_URL}/${id}`);
+    } catch (error) {
+      console.error('Error deleting employee:', error);
+      
+      // Provide more specific error messages based on response status
+      if (error.response) {
+        const status = error.response.status;
+        const message = error.response.data?.message || error.response.data || 'Unknown error';
+        
+        switch (status) {
+          case 404:
+            throw new Error('Employee not found');
+          case 400:
+            throw new Error('Cannot delete employee: ' + message);
+          case 403:
+            throw new Error('Access denied: You do not have permission to delete this employee');
+          case 409:
+            throw new Error('Cannot delete employee: Employee may have associated records');
+          default:
+            throw new Error(`Failed to delete employee: ${message}`);
+        }
+      } else if (error.request) {
+        throw new Error('Network error: Unable to connect to server');
+      } else {
+        throw new Error('An unexpected error occurred while deleting employee');
+      }
+    }
   }
 };
 

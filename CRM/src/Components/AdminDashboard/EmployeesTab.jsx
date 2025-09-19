@@ -6,6 +6,7 @@ import { Modal } from '../common/ui/Base.jsx';
 import { Toast } from '../common/ui/Toast.jsx';
 import { Spinner } from '../common/ui/Spinner.jsx';
 import { Card } from '../common/ui/Base.jsx';
+import EmployeeService from '../../services/EmployeeService';
 
 const EmployeesTab = ({ onError, onSuccess }) => {
   const [employees, setEmployees] = useState([]);
@@ -31,10 +32,7 @@ const EmployeesTab = ({ onError, onSuccess }) => {
   const fetchEmployees = async () => {
     setLoadingEmployees(true);
     try {
-      const response = await fetch("http://localhost:8080/api/employees");
-      if (!response.ok) throw new Error("Failed to fetch employees");
-
-      const data = await response.json();
+      const data = await EmployeeService.getAllEmployees();
       setEmployees(data);
       setToast({
         open: true,
@@ -58,10 +56,7 @@ const EmployeesTab = ({ onError, onSuccess }) => {
     const loadInitialEmployees = async () => {
       setLoadingEmployees(true);
       try {
-        const response = await fetch("http://localhost:8080/api/employees");
-        if (!response.ok) throw new Error("Failed to fetch employees");
-
-        const data = await response.json();
+        const data = await EmployeeService.getAllEmployees();
         setEmployees(data);
       } catch (err) {
         console.error("Error fetching employees:", err);
@@ -126,33 +121,13 @@ const EmployeesTab = ({ onError, onSuccess }) => {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/employees", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: newEmployee.name,
-          email: newEmployee.email,
-          phone: newEmployee.phone,
-          hashedPassword: newEmployee.password,
-        }),
+      const newEmployeeData = await EmployeeService.createEmployee({
+        name: newEmployee.name,
+        email: newEmployee.email,
+        phone: newEmployee.phone,
+        hashedPassword: newEmployee.password,
       });
 
-      if (!response.ok) {
-        // Get detailed error message from response
-        let errorMessage = "Failed to create employee";
-        try {
-          const errorData = await response.text();
-          console.error("API Error Response:", errorData);
-          errorMessage = `Failed to create employee (${response.status}): ${errorData}`;
-        } catch {
-          errorMessage = `Failed to create employee (${response.status})`;
-        }
-        throw new Error(errorMessage);
-      }
-
-      const newEmployeeData = await response.json();
       setEmployees([...employees, newEmployeeData]);
       setToast({
         open: true,
@@ -263,17 +238,7 @@ const EmployeesTab = ({ onError, onSuccess }) => {
         updateData.hashedPassword = editingEmployee.password;
       }
 
-      const response = await fetch(`http://localhost:8080/api/employees/${editingEmployee.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updateData),
-      });
-
-      if (!response.ok) throw new Error("Failed to update employee");
-
-      const updatedEmployee = await response.json();
+      const updatedEmployee = await EmployeeService.updateEmployee(editingEmployee.id, updateData);
       setEmployees(employees.map(emp => 
         emp.id === editingEmployee.id ? updatedEmployee : emp
       ));
@@ -302,14 +267,7 @@ const EmployeesTab = ({ onError, onSuccess }) => {
 
   const handleDeleteEmployee = async (employeeId) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/employees/${employeeId}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to delete employee");
+      await EmployeeService.deleteEmployee(employeeId);
 
       setEmployees(
         employees.filter((employee) => employee.id !== employeeId)
@@ -324,12 +282,13 @@ const EmployeesTab = ({ onError, onSuccess }) => {
       setEmployeeToDelete(null);
     } catch (err) {
       console.error("Error deleting employee:", err);
+      const errorMessage = err.message || 'Failed to delete employee. Please try again.';
       setToast({
         open: true,
-        message: 'Failed to delete employee. Please try again.',
+        message: `❌ ${errorMessage}`,
         type: 'error'
       });
-      if (onError) onError("Failed to delete employee. Please try again.");
+      if (onError) onError(errorMessage);
     }
   };
 

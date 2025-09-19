@@ -130,6 +130,50 @@ const AuthService = {
     if (AuthService.isCustomerLoggedIn()) return AuthService.getCurrentCustomer();
     return null;
   },
+
+  // Forgot password
+  forgotPassword: async (email) => {
+    try {
+      const response = await axios.post(`${API_URL}/forgot-password`, {
+        email: email.trim()
+      });
+      return response.data;
+    } catch (error) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      } else {
+        throw new Error("Failed to send password reset email. Please try again.");
+      }
+    }
+  },
+
+  // Validate password reset token
+  validateResetToken: async (token) => {
+    try {
+      const response = await axios.get(`${API_URL}/password-reset/validate?token=${token}`);
+      return response.data;
+    } catch (error) {
+      console.error("Token validation error:", error);
+      throw new Error("Invalid or expired reset token.");
+    }
+  },
+
+  // Reset password
+  resetPassword: async (token, newPassword) => {
+    try {
+      const response = await axios.post(`${API_URL}/password-reset/reset`, {
+        token: token,
+        newPassword: newPassword
+      });
+      return response.data;
+    } catch (error) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      } else {
+        throw new Error("Failed to reset password. Please try again.");
+      }
+    }
+  },
 };
 
 export default AuthService;

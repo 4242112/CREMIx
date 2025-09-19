@@ -1,7 +1,8 @@
 // FILE: src/Components/AdminDashboard/CustomersTab.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Pagination from "../common/Pagination";
 import QuotationService from "../../services/QuotationService";
+import CustomerService from "../../services/CustomerService";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
@@ -15,66 +16,12 @@ export default function CustomersTab({ onError }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [customersPerPage] = useState(10);
   
-  // Quotation modal state
-  const [showQuotationModal, setShowQuotationModal] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [quotationForm, setQuotationForm] = useState({
-    title: '',
-    description: '',
-    validUntil: '',
-    items: []
-  });
 
-  // Handle creating quotation for customer
-  const handleCreateQuotation = (customer) => {
-    setSelectedCustomer(customer);
-    setQuotationForm({
-      title: `Quotation for ${customer.name}`,
-      description: '',
-      validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
-      items: []
-    });
-    setShowQuotationModal(true);
-  };
 
-  const handleSaveQuotation = async () => {
-    if (!selectedCustomer || !quotationForm.title) {
-      setMessage("Please fill in all required fields");
-      return;
-    }
-
-    try {
-      const quotationData = {
-        ...quotationForm,
-        amount: 0, // Will be calculated based on items
-        items: quotationForm.items.length > 0 ? quotationForm.items : [
-          // Default empty item if no items specified
-          {
-            product: { name: "Service/Product" },
-            quantity: 1,
-            discount: 0
-          }
-        ]
-      };
-
-      await QuotationService.createQuotationForCustomer(selectedCustomer.id, quotationData);
-      setMessage(`Quotation created successfully for ${selectedCustomer.name}`);
-      setShowQuotationModal(false);
-      setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
-      console.error("Error creating quotation:", error);
-      setMessage("Failed to create quotation. Please try again.");
-      setTimeout(() => setMessage(null), 3000);
-    }
-  };
-
-  const fetchCustomers = async () => {
+  const fetchCustomers = useCallback(async () => {
     setLoadingCustomers(true);
     try {
-      const response = await fetch("http://localhost:8080/api/customers");
-      if (!response.ok) throw new Error("Failed to fetch customers");
-
-      const data = await response.json();
+      const data = await CustomerService.getAllCustomers();
       setCustomers(data);
       onError("");
     } catch (err) {
@@ -83,11 +30,11 @@ export default function CustomersTab({ onError }) {
     } finally {
       setLoadingCustomers(false);
     }
-  };
+  }, [onError]);
 
   useEffect(() => {
     fetchCustomers();
-  }, []);
+  }, [fetchCustomers]);
 
   const exportToExcel = () => {
     setExportLoading(true);
@@ -271,13 +218,7 @@ export default function CustomersTab({ onError }) {
                     : customer.address || "N/A"}
                 </td>
                 <td className="py-2 px-4 border-b">
-                  <button
-                    onClick={() => handleCreateQuotation(customer)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm mr-2"
-                    title="Create Quotation"
-                  >
-                    Create Quote
-                  </button>
+    
                 </td>
               </tr>
             ))}
@@ -295,65 +236,7 @@ export default function CustomersTab({ onError }) {
         />
       </div>
 
-      {/* Create Quotation Modal */}
-      {showQuotationModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-96 max-w-90">
-            <h3 className="text-lg font-bold mb-4">
-              Create Quotation for {selectedCustomer?.name}
-            </h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Title *</label>
-                <input
-                  type="text"
-                  value={quotationForm.title}
-                  onChange={(e) => setQuotationForm({...quotationForm, title: e.target.value})}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-                  placeholder="Quotation title"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-1">Description</label>
-                <textarea
-                  value={quotationForm.description}
-                  onChange={(e) => setQuotationForm({...quotationForm, description: e.target.value})}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-                  rows="3"
-                  placeholder="Quotation description"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-1">Valid Until</label>
-                <input
-                  type="date"
-                  value={quotationForm.validUntil}
-                  onChange={(e) => setQuotationForm({...quotationForm, validUntil: e.target.value})}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-                />
-              </div>
-            </div>
-            
-            <div className="flex justify-end gap-2 mt-6">
-              <button
-                onClick={() => setShowQuotationModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveQuotation}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Create Quotation
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

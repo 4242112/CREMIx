@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import TicketService, { TicketStatus, formatDate } from "../../services/TicketService";
+import TicketService, {
+  TicketStatus,
+  formatDate,
+} from "../../services/TicketService";
 import AuthService from "../../services/AuthService";
 import Pagination from "../common/Pagination";
 
@@ -149,9 +152,7 @@ const Tickets = () => {
     <div className="p-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-4 p-3 rounded bg-slate-900 text-white shadow">
-        <h3 className="m-0 flex items-center gap-2">
-          🎟️ Support Tickets
-        </h3>
+        <h3 className="m-0 flex items-center gap-2">🎟️ Support Tickets</h3>
         <div className="flex gap-2">
           <button
             onClick={fetchTickets}
@@ -210,8 +211,12 @@ const Tickets = () => {
                         {ticket.status}
                       </span>
                     </td>
-                    <td className="p-2 border">{formatDate(ticket.createdAt)}</td>
-                    <td className="p-2 border">{formatDate(ticket.updatedAt)}</td>
+                    <td className="p-2 border">
+                      {formatDate(ticket.createdAt)}
+                    </td>
+                    <td className="p-2 border">
+                      {formatDate(ticket.updatedAt)}
+                    </td>
                     <td className="p-2 border flex gap-2">
                       <button
                         onClick={() => handleOpenTicket(ticket)}
@@ -241,10 +246,6 @@ const Tickets = () => {
           </div>
         )}
       </div>
-
-      {/* TODO: Replace Bootstrap Modals with Tailwind modals */}
-      {/* Right now, I'm keeping logic intact. You can implement custom Tailwind modal UI 
-          or I can add HeadlessUI/Flowbite modal for cleaner code. */}
     </div>
   );
 };

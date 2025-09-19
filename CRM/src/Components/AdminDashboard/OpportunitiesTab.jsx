@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Pagination from "../common/Pagination";
@@ -6,6 +7,7 @@ import OpportunityService from "../../services/OpportunityService";
 
 const OpportunitiesTab = ({ onError }) => {
   const [opportunities, setOpportunities] = useState([]);
+  const navigate = useNavigate();
   const [loadingOpportunities, setLoadingOpportunities] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
   const [message, setMessage] = useState(null);
@@ -254,18 +256,10 @@ const OpportunitiesTab = ({ onError }) => {
                   <div className="flex gap-2">
                     <button 
                       className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
-                      onClick={() => {/* Add view details functionality */}}
+                      onClick={() => navigate(`/admin/opportunity/${opportunity.id}`)}
                     >
                       View
                     </button>
-                    {!opportunity.quotation && (
-                      <button 
-                        className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700"
-                        onClick={() => {/* Add create quotation functionality */}}
-                      >
-                        Create Quote
-                      </button>
-                    )}
                   </div>
                 </td>
               </tr>

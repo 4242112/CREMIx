@@ -1,4 +1,5 @@
-import apiClient from "./apiClient";
+import apiClient from './apiClient';
+import { parseDate } from '../utils/dateUtils';
 
 // DateTime = [year, month, day, hour, minute]
 
@@ -71,12 +72,19 @@ export const getCurrentDateTime = () => {
  * @returns {number[]} DateTime
  */
 export const dateStringToDateTime = (dateString) => {
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) {
-    console.error("Invalid date string:", dateString);
+  try {
+    const date = parseDate(dateString);
+    
+    if (!date) {
+      console.error("Invalid date string:", dateString);
+      return getCurrentDateTime();
+    }
+    
+    return dateToDateTime(date);
+  } catch (error) {
+    console.error("Error parsing date string:", dateString, error);
     return getCurrentDateTime();
   }
-  return dateToDateTime(date);
 };
 
 const BASE_URL = "/call-logs";
