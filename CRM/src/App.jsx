@@ -65,6 +65,9 @@ function App() {
         {/* Admin Dashboard Route - outside MainLayout for dedicated admin interface */}
         <Route path="/admin/dashboard" element={<ModernAdminDashboard />} />
         
+        {/* Admin Customer Details Route - outside MainLayout to maintain admin context */}
+        <Route path="/admin/customer/:id" element={<ModernAdminDashboard />} />
+        
         {/* Protected Routes - inside MainLayout */}
         <Route path="/" element={
           <ProtectedRoute>
@@ -101,7 +104,7 @@ function App() {
           </ProtectedRoute>
         } />
         
-        <Route path="/tickets/in-progress" element={
+        <Route path="/tickets/in-progress-tickets" element={
           <ProtectedRoute>
             <MainLayout>
               <InProgressTickets />
@@ -149,7 +152,7 @@ function App() {
           </ProtectedRoute>
         } />
         
-        <Route path="/opportunities" element={
+        <Route path="/opportunity" element={
           <ProtectedRoute>
             <MainLayout>
               <ManageOpportunity />
@@ -157,7 +160,15 @@ function App() {
           </ProtectedRoute>
         } />
         
-        <Route path="/opportunities/recycle-bin" element={
+        <Route path="/opportunity/manage" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ManageOpportunity />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/opportunity/recycle-bin" element={
           <ProtectedRoute>
             <MainLayout>
               <OpportunityRecycleBin />
@@ -165,7 +176,7 @@ function App() {
           </ProtectedRoute>
         } />
         
-        <Route path="/opportunities/:id" element={
+        <Route path="/opportunity/:id" element={
           <ProtectedRoute>
             <MainLayout>
               <OpportunityViewDetails />
@@ -173,7 +184,7 @@ function App() {
           </ProtectedRoute>
         } />
         
-        <Route path="/customers" element={
+        <Route path="/customer" element={
           <ProtectedRoute>
             <MainLayout>
               <ModernCustomersPage />
@@ -181,7 +192,7 @@ function App() {
           </ProtectedRoute>
         } />
         
-        <Route path="/customers/manage" element={
+        <Route path="/customer/manage" element={
           <ProtectedRoute>
             <MainLayout>
               <ManageCustomers />
@@ -189,7 +200,7 @@ function App() {
           </ProtectedRoute>
         } />
         
-        <Route path="/customers/recycle-bin" element={
+        <Route path="/customer/recycle-bin" element={
           <ProtectedRoute>
             <MainLayout>
               <CustomerRecycleBin />
@@ -197,7 +208,7 @@ function App() {
           </ProtectedRoute>
         } />
         
-        <Route path="/customers/:id" element={
+        <Route path="/customer/:id" element={
           <ProtectedRoute>
             <MainLayout>
               <CustomersViewDetails />
@@ -205,7 +216,7 @@ function App() {
           </ProtectedRoute>
         } />
         
-        <Route path="/catalog/categories" element={
+        <Route path="/catalog/category" element={
           <ProtectedRoute>
             <MainLayout>
               <Category />
@@ -231,6 +242,14 @@ function App() {
         
         {/* Customer Routes */}
         <Route path="/customer/dashboard" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <CustomerDashboard />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/customer-portal" element={
           <ProtectedRoute>
             <MainLayout>
               <CustomerDashboard />

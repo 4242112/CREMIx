@@ -1,5 +1,6 @@
 // FILE: src/Components/AdminDashboard/CustomersTab.jsx
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Pagination from "../common/Pagination";
 import QuotationService from "../../services/QuotationService";
 import CustomerService from "../../services/CustomerService";
@@ -7,6 +8,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 export default function CustomersTab({ onError }) {
+  const navigate = useNavigate();
   const [customers, setCustomers] = useState([]);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
@@ -31,6 +33,11 @@ export default function CustomersTab({ onError }) {
       setLoadingCustomers(false);
     }
   }, [onError]);
+
+  // Function to handle viewing customer details
+  const handleViewCustomer = (customerId) => {
+    navigate(`/admin/customer/${customerId}`);
+  };
 
   useEffect(() => {
     fetchCustomers();
@@ -218,7 +225,13 @@ export default function CustomersTab({ onError }) {
                     : customer.address || "N/A"}
                 </td>
                 <td className="py-2 px-4 border-b">
-    
+                  <button
+                    onClick={() => handleViewCustomer(customer.id)}
+                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200"
+                    title="View customer details"
+                  >
+                    👁 View
+                  </button>
                 </td>
               </tr>
             ))}

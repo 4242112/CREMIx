@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
 import Header from "./HeaderComponents/Header";
 import Sidebar_new from "./SidebarComponents/Sidebar_new";
 import ConnectionStatus from "../common/ConnectionStatus";
 
-const MainLayout = () => {
+const MainLayout = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
@@ -22,7 +21,7 @@ const MainLayout = () => {
         <Header />
         <main className="flex-1 p-6 overflow-auto">
           <div className="max-w-7xl mx-auto">
-            <Outlet />
+            {children}
           </div>
         </main>
       </div>

@@ -9,6 +9,8 @@ const EscalatedTicketsTab = ({ onError }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [viewingTicket, setViewingTicket] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
   const fetchEscalatedTickets = async () => {
@@ -45,6 +47,11 @@ const EscalatedTicketsTab = ({ onError }) => {
   const handleWorkOnTicket = (ticket) => {
     setSelectedTicket(ticket);
     setIsModalOpen(true);
+  };
+
+  const handleViewDetails = (ticket) => {
+    setViewingTicket(ticket);
+    setIsDetailsModalOpen(true);
   };
 
   const handleModalClose = () => {
@@ -230,6 +237,7 @@ const EscalatedTicketsTab = ({ onError }) => {
                   </button>
                 )}
                 <button
+                  onClick={() => handleViewDetails(ticket)}
                   className="px-3 py-1 text-xs border border-gray-300 text-gray-600 rounded hover:bg-gray-50 transition-colors"
                 >
                   📄 View Details
@@ -255,6 +263,109 @@ const EscalatedTicketsTab = ({ onError }) => {
         currentUser={currentUser}
         onSuccess={handleResolutionSuccess}
       />
+
+      {/* Ticket Details Modal */}
+      {isDetailsModalOpen && viewingTicket && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">Ticket Details</h3>
+              <button
+                onClick={() => setIsDetailsModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ticket ID</label>
+                <p className="text-gray-900">#{viewingTicket.id}</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <p className="text-gray-900">{viewingTicket.title || 'No title'}</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Customer</label>
+                <p className="text-gray-900">{viewingTicket.customer || viewingTicket.customerName || 'Unknown'}</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                  viewingTicket.status === 'URGENT' ? 'bg-red-100 text-red-800' :
+                  viewingTicket.status === 'NEW' ? 'bg-blue-100 text-blue-800' :
+                  viewingTicket.status === 'IN_PROGRESS' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {viewingTicket.status}
+                </span>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                  viewingTicket.priority === 'HIGH' ? 'bg-red-100 text-red-800' :
+                  viewingTicket.priority === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-green-100 text-green-800'
+                }`}>
+                  {viewingTicket.priority || 'NORMAL'}
+                </span>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <div className="bg-gray-50 p-3 rounded border max-h-40 overflow-y-auto">
+                  <p className="text-gray-900 whitespace-pre-wrap">{viewingTicket.description || 'No description available'}</p>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Created</label>
+                <p className="text-gray-900">{viewingTicket.created || 'Unknown'}</p>
+              </div>
+              
+              {viewingTicket.assignedTo && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
+                  <p className="text-gray-900">{viewingTicket.assignedTo}</p>
+                </div>
+              )}
+              
+              {viewingTicket.lastUpdated && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
+                  <p className="text-gray-900">{formatDate(viewingTicket.lastUpdated)}</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex justify-end mt-6 gap-2">
+              <button
+                onClick={() => setIsDetailsModalOpen(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
+              >
+                Close
+              </button>
+              {(viewingTicket.status === 'URGENT' || viewingTicket.status === 'NEW') && (
+                <button
+                  onClick={() => {
+                    setIsDetailsModalOpen(false);
+                    handleWorkOnTicket(viewingTicket);
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                >
+                  Work On This Ticket
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

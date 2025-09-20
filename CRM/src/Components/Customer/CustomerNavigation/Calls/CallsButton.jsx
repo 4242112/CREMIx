@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import CallLogService from '../../../../services/CallLogService';
 
 const CallsButton = ({ customer }) => {
@@ -6,16 +6,10 @@ const CallsButton = ({ customer }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (customer?.id) {
-      fetchCalls();
-    }
-  }, [customer]);
-
-  const fetchCalls = async () => {
+  const fetchCalls = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await CallLogService.getCallLogsByCustomer(customer.id);
+      const data = await CallLogService.getCallLogsByCustomerId(customer.id);
       setCalls(data);
     } catch (err) {
       console.error('Error fetching calls:', err);
@@ -23,7 +17,13 @@ const CallsButton = ({ customer }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [customer.id]);
+
+  useEffect(() => {
+    if (customer?.id) {
+      fetchCalls();
+    }
+  }, [customer, fetchCalls]);
 
   if (loading) {
     return (

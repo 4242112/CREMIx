@@ -1,6 +1,6 @@
 // FILE: src/Components/AdminDashboard/ModernAdminDashboard.jsx
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import AuthService from "../../services/AuthService";
 import TicketService from "../../services/TicketService";
 import EmployeeService from "../../services/EmployeeService";
@@ -18,15 +18,21 @@ import EscalatedTicketsTab from "./EscalatedTicketsTab";
 // Import other components for catalog and tickets
 import Products from "../Catalog/Products";
 import Category from "../Catalog/Category";
+import CustomersViewDetails from "../Customer/CustomerViewDetails";
 
 const ModernAdminDashboard = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const location = useLocation();
   const [activeSection, setActiveSection] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [userRole, setUserRole] = useState(null); // 'admin' or 'employee'
+  
+  // Check if we're viewing a customer
+  const isViewingCustomer = location.pathname.startsWith('/admin/customer/') && id;
   
   // Dashboard stats state
   const [dashboardStats, setDashboardStats] = useState({
@@ -265,6 +271,23 @@ const ModernAdminDashboard = () => {
   );
 
   const renderContent = () => {
+    // If viewing a customer, show customer details
+    if (isViewingCustomer) {
+      return (
+        <div>
+          <div className="mb-4">
+            <button
+              onClick={() => navigate('/admin/dashboard')}
+              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+            >
+              ← Back to Admin Dashboard
+            </button>
+          </div>
+          <CustomersViewDetails />
+        </div>
+      );
+    }
+
     const currentItem = menuItems.find(item => item.id === activeSection);
     const isReadOnly = currentItem?.permission === "read";
 

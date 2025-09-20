@@ -8,7 +8,7 @@ import NotesButton from './LeadNavigation/LeadNavButtons/Notes/Notes';
 import EditLeads from './Buttons/Edit';
 import LeadService from '../../services/LeadService';
 
-const LeadViewDetails = ({ lead: propLead, EditComponent : EditLeads }) => {
+const LeadViewDetails = ({ lead: propLead, EditComponent = EditLeads }) => {
   const [activeTab, setActiveTab] = useState('profile');
   const [lead, setLead] = useState(propLead || null);
   const [loading, setLoading] = useState(false);
